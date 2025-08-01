@@ -17,7 +17,7 @@ export const ContactSection = () => {
     {
       icon: Clock,
       title: "Open Hours",
-      details: "Sunday - Friday: 08:00 - 18:00"
+      details: "Monday - Saturday: 08:00 - 18:00"
     }
   ];
 
