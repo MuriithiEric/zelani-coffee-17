@@ -12,7 +12,7 @@ export const ContactSection = () => {
     {
       icon: Globe,
       title: "Website",
-      details: "zelanicoffee.co.ke"
+      details: "zelanicoffee.com"
     },
     {
       icon: Clock,
