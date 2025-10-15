@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -24,24 +24,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleBuyNow = () => {
-    setIsProcessing(true);
-    
-    // Check if IntaSend is loaded
-    if (typeof window.IntaSend === 'undefined') {
-      console.error('IntaSend script not loaded');
-      alert('Payment system is loading. Please try again in a moment.');
-      setIsProcessing(false);
-      return;
-    }
-
-    try {
-      const checkout = new window.IntaSend({
+  // Initialize IntaSend on component mount
+  useEffect(() => {
+    if (typeof window.IntaSend !== 'undefined') {
+      new window.IntaSend({
         publicAPIKey: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
         live: false
-      });
-
-      checkout
+      })
         .on("COMPLETE", (response: any) => {
           console.log("Payment completed:", response);
           window.location.href = "/thank-you";
@@ -52,23 +41,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         })
         .on("IN-PROGRESS", () => {
           console.log("Payment in progress");
+          setIsProcessing(true);
         });
-
-      checkout.collect({
-        amount: product.price,
-        currency: "KES",
-        api_ref: `zelani_${product.id}_${Date.now()}`,
-        email: "",
-        first_name: "",
-        last_name: "",
-        phone_number: ""
-      });
-    } catch (error) {
-      console.error('IntaSend error:', error);
-      alert('Payment initialization failed. Please try again.');
-      setIsProcessing(false);
     }
-  };
+  }, []);
 
   return (
     <>
@@ -131,9 +107,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               </Button>
               <Button
                 size="sm"
-                onClick={handleBuyNow}
                 disabled={isProcessing}
-                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900"
+                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900 intaSendPayButton"
+                data-amount={product.price}
+                data-currency="KES"
+                data-api_ref={`zelani_${product.id}_${Date.now()}`}
               >
                 <ShoppingCart className="h-4 w-4 mr-1" />
                 {isProcessing ? "..." : "Buy Now"}
@@ -193,10 +171,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 KES {product.price.toLocaleString()}
               </span>
               <Button
-                onClick={handleBuyNow}
                 disabled={isProcessing}
                 size="lg"
-                className="bg-gold-500 hover:bg-gold-600 text-coffee-900"
+                className="bg-gold-500 hover:bg-gold-600 text-coffee-900 intaSendPayButton"
+                data-amount={product.price}
+                data-currency="KES"
+                data-api_ref={`zelani_${product.id}_${Date.now()}`}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 {isProcessing ? "Processing..." : "Buy Now"}
