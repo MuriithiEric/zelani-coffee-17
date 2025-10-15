@@ -6,34 +6,34 @@ const ThankYou = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-sand-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-cream-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-forest-600 rounded-full mb-8 animate-scale-in">
-          <CheckCircle className="h-12 w-12 text-sand-50" />
+        <div className="inline-flex items-center justify-center w-24 h-24 bg-gold-500 rounded-full mb-8 animate-scale-in">
+          <CheckCircle className="h-12 w-12 text-coffee-900" />
         </div>
         
-        <h1 className="font-playfair text-4xl md:text-5xl font-bold text-espresso-900 mb-4">
+        <h1 className="font-playfair text-4xl md:text-5xl font-bold text-coffee-900 mb-4">
           Thank You for Your Order!
         </h1>
         
-        <p className="text-xl text-espresso-700 mb-8 leading-relaxed">
+        <p className="text-xl text-coffee-700 mb-8 leading-relaxed">
           Your payment has been processed successfully. We're excited to get your 
           Zelani Coffee on its way to you!
         </p>
         
         <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="font-semibold text-espresso-800 text-lg mb-4">What's Next?</h2>
-          <ul className="text-left text-espresso-600 space-y-3">
+          <h2 className="font-semibold text-coffee-800 text-lg mb-4">What's Next?</h2>
+          <ul className="text-left text-coffee-600 space-y-3">
             <li className="flex items-start">
-              <span className="text-forest-600 mr-2">✓</span>
+              <span className="text-gold-600 mr-2">✓</span>
               You'll receive an email confirmation with your order details
             </li>
             <li className="flex items-start">
-              <span className="text-forest-600 mr-2">✓</span>
+              <span className="text-gold-600 mr-2">✓</span>
               We'll prepare your fresh coffee and ship it within 1-2 business days
             </li>
             <li className="flex items-start">
-              <span className="text-forest-600 mr-2">✓</span>
+              <span className="text-gold-600 mr-2">✓</span>
               Expect delivery within 3-5 business days in Kenya
             </li>
           </ul>
@@ -43,7 +43,7 @@ const ThankYou = () => {
           <Button
             onClick={() => navigate("/")}
             size="lg"
-            className="bg-forest-600 hover:bg-forest-700 text-sand-50"
+            className="bg-gold-500 hover:bg-gold-600 text-coffee-900"
           >
             <Home className="mr-2 h-5 w-5" />
             Return Home
@@ -52,16 +52,16 @@ const ThankYou = () => {
             onClick={() => navigate("/#products")}
             variant="outline"
             size="lg"
-            className="border-espresso-600 text-espresso-800"
+            className="border-coffee-600 text-coffee-800"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
             Continue Shopping
           </Button>
         </div>
 
-        <p className="mt-12 text-sm text-espresso-500">
+        <p className="mt-12 text-sm text-coffee-500">
           Questions about your order? Contact us at{" "}
-          <a href="mailto:info@zelanicoffee.com" className="text-forest-600 hover:underline">
+          <a href="mailto:info@zelanicoffee.com" className="text-gold-600 hover:underline">
             info@zelanicoffee.com
           </a>
         </p>
