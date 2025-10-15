@@ -20,10 +20,44 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'playfair': ['Playfair Display', 'serif'],
-				'inter': ['Inter', 'sans-serif'],
+				inter: ["Inter", "sans-serif"],
+				playfair: ["Playfair Display", "serif"]
 			},
 			colors: {
+				espresso: {
+					50: "hsl(25, 20%, 95%)",
+					100: "hsl(25, 20%, 85%)",
+					200: "hsl(25, 25%, 75%)",
+					300: "hsl(25, 25%, 65%)",
+					400: "hsl(25, 30%, 50%)",
+					500: "hsl(25, 35%, 35%)",
+					600: "hsl(25, 35%, 25%)",
+					700: "hsl(25, 35%, 20%)",
+					800: "hsl(25, 40%, 15%)",
+					900: "hsl(25, 45%, 10%)"
+				},
+				forest: {
+					50: "hsl(145, 20%, 95%)",
+					100: "hsl(145, 20%, 85%)",
+					200: "hsl(145, 22%, 75%)",
+					300: "hsl(145, 24%, 65%)",
+					400: "hsl(145, 25%, 50%)",
+					500: "hsl(145, 25%, 35%)",
+					600: "hsl(145, 28%, 28%)",
+					700: "hsl(145, 30%, 22%)",
+					800: "hsl(145, 32%, 18%)",
+					900: "hsl(145, 35%, 12%)"
+				},
+				sand: {
+					50: "hsl(35, 40%, 98%)",
+					100: "hsl(35, 40%, 95%)",
+					200: "hsl(35, 40%, 90%)",
+					300: "hsl(35, 42%, 85%)",
+					400: "hsl(35, 45%, 80%)",
+					500: "hsl(35, 45%, 75%)",
+					600: "hsl(35, 48%, 70%)",
+					700: "hsl(35, 50%, 65%)"
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -57,7 +91,7 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Coffee-inspired colors
+				// Legacy coffee colors (keeping for backwards compatibility)
 				coffee: {
 					50: '#fdfcfc',
 					100: '#f7f3f0',

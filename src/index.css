@@ -3,39 +3,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Coffee-themed design system */
+/* Zelani Coffee - Nomad design system */
 
 @layer base {
   :root {
-    --background: 25 20% 96%;
-    --foreground: 30 15% 15%;
+    --background: 35 25% 95%;
+    --foreground: 25 15% 12%;
 
-    --card: 25 20% 98%;
-    --card-foreground: 30 15% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 25 15% 12%;
 
-    --popover: 25 20% 98%;
-    --popover-foreground: 30 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 15% 12%;
 
-    --primary: 30 45% 25%;
-    --primary-foreground: 25 20% 96%;
+    --primary: 25 35% 20%;
+    --primary-foreground: 35 30% 92%;
 
-    --secondary: 35 25% 88%;
-    --secondary-foreground: 30 15% 25%;
+    --secondary: 145 25% 35%;
+    --secondary-foreground: 35 30% 92%;
 
-    --muted: 35 25% 92%;
-    --muted-foreground: 30 10% 45%;
+    --muted: 35 15% 88%;
+    --muted-foreground: 25 10% 45%;
 
-    --accent: 40 50% 75%;
-    --accent-foreground: 30 15% 15%;
+    --accent: 35 45% 75%;
+    --accent-foreground: 25 15% 12%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 25 20% 96%;
+    --destructive-foreground: 35 30% 92%;
 
-    --border: 35 25% 88%;
-    --input: 35 25% 88%;
-    --ring: 30 45% 25%;
+    --border: 35 15% 85%;
+    --input: 35 15% 85%;
+    --ring: 25 35% 20%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   * {
@@ -54,14 +54,20 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-coffee-600 via-coffee-500 to-gold-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
   
-  .coffee-shadow {
-    box-shadow: 0 10px 40px rgba(139, 90, 60, 0.1);
+  .card-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
   
   .hover-lift {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .parallax-bg {
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
   }
 }
