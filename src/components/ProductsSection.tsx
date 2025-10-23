@@ -14,15 +14,37 @@ export const ProductsSection = () => {
       details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
     },
     {
-      id: "premium-medium-roast-250g",
+      id: "premium-medium-roast-1kg",
       name: "Premium Medium Roast",
-      description: "Perfectly balanced Arabica with bright, complex flavors. Pre-ground for convenience without compromising quality.",
-      price: 650,
-      image: "/lovable-uploads/5df176de-0b1d-46e9-b1ae-d4641f01c915.png",
+      description: "Perfectly balanced Arabica with bright, complex flavors. Our largest size for true coffee enthusiasts.",
+      price: 2450,
+      image: "/lovable-uploads/premium-medium-roast-1kg.jpeg",
       grind: "Medium Ground",
-      size: "250g",
+      size: "1kg",
       tastingNotes: ["Caramel", "Floral Notes", "Wine"],
-      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
+      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This 1kg package offers exceptional value for coffee lovers who want to stock up on their favorite roast. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
+    },
+    {
+      id: "premium-medium-roast-125g",
+      name: "Premium Medium Roast",
+      description: "Perfectly balanced Arabica with bright, complex flavors. Perfect starter size to discover our signature roast.",
+      price: 350,
+      image: "/lovable-uploads/premium-medium-roast-125g.jpeg",
+      grind: "Medium Ground",
+      size: "125g",
+      tastingNotes: ["Caramel", "Floral Notes", "Wine"],
+      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This compact 125g package is perfect for trying our signature roast or for those who prefer smaller quantities to ensure maximum freshness. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
+    },
+    {
+      id: "premium-medium-roast-500g",
+      name: "Premium Medium Roast",
+      description: "Perfectly balanced Arabica with bright, complex flavors. The ideal mid-size option for regular coffee drinkers.",
+      price: 1250,
+      image: "/lovable-uploads/premium-medium-roast-500g.jpeg",
+      grind: "Medium Ground",
+      size: "500g",
+      tastingNotes: ["Caramel", "Floral Notes", "Wine"],
+      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This 500g package offers a great balance between value and freshness for regular coffee drinkers. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
     },
     {
       id: "drip-bags-10pack",
