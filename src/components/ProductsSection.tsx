@@ -3,26 +3,26 @@ import { ProductCard } from "./ProductCard";
 export const ProductsSection = () => {
   const products = [
     {
-      id: "whole-beans-250g",
-      name: "Whole Beans",
-      description: "Pure Arabica from Kirinyaga highlands. Perfect for those who prefer to grind fresh.",
-      price: 1200,
+      id: "premium-dark-roast-250g",
+      name: "Premium Dark Roast",
+      description: "Bold and rich Arabica from Kirinyaga highlands. A full-bodied dark roast for those who love intense flavor.",
+      price: 650,
       image: "/lovable-uploads/4c88326b-c4a8-48f1-8877-1c643256d8bf.png",
       grind: "Whole Beans",
       size: "250g",
       tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
-      details: "Our whole bean coffee preserves maximum freshness and flavor complexity. Sourced from smallholder farmers in Kirinyaga County, these beans are carefully hand-picked at peak ripeness and processed using traditional methods that honor generations of coffee expertise."
+      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
     },
     {
-      id: "ground-250g",
-      name: "Ground Coffee",
-      description: "Pre-ground for convenience without compromising quality. Ready to brew.",
-      price: 1200,
+      id: "premium-medium-roast-250g",
+      name: "Premium Medium Roast",
+      description: "Perfectly balanced Arabica with bright, complex flavors. Pre-ground for convenience without compromising quality.",
+      price: 650,
       image: "/lovable-uploads/5df176de-0b1d-46e9-b1ae-d4641f01c915.png",
       grind: "Medium Ground",
       size: "250g",
       tastingNotes: ["Caramel", "Floral Notes", "Wine"],
-      details: "Expertly ground to medium consistency, perfect for pour-over, drip, or French press methods. This ground coffee maintains the vibrant character of our Kirinyaga beans while offering the convenience of ready-to-brew coffee for your daily ritual."
+      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
     },
     {
       id: "drip-bags-10pack",
