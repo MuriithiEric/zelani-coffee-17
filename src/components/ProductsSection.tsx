@@ -89,28 +89,6 @@ export const ProductsSection = () => {
       size: "250g",
       tastingNotes: ["Caramel", "Floral Notes", "Wine"],
       details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This versatile 250g package is perfect for everyday coffee lovers who want a balanced size that maintains freshness while providing enough coffee for daily brewing. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
-    },
-    {
-      id: "drip-bags-10pack",
-      name: "Drip Bags",
-      description: "Portable single-serve drip bags. Coffee on the go, crafted with care.",
-      price: 1500,
-      image: "/lovable-uploads/6fcd7107-6cd4-4614-be92-a694e1243d0c.png",
-      grind: "Drip Bag",
-      size: "10-pack",
-      tastingNotes: ["Bright Acidity", "Berry", "Honey"],
-      details: "Ten individually wrapped drip bags for the nomad in you. Each bag contains perfectly portioned, freshly ground coffee that brews directly in your cup. Ideal for travel, office, or camping — just add hot water and experience specialty coffee anywhere."
-    },
-    {
-      id: "sampler-trio-3x100g",
-      name: "Sampler Trio",
-      description: "Three 100g bags showcasing our range. Explore the full Zelani experience.",
-      price: 1800,
-      image: "/lovable-uploads/f6ce5f0e-3daa-4d78-ae9e-8fef11b33995.png",
-      grind: "Variety",
-      size: "3×100g",
-      tastingNotes: ["Multi-profile", "Discovery Pack", "Full Range"],
-      details: "A curated collection featuring three distinct roast profiles from our Kirinyaga origins. This sampler includes light, medium, and dark roasts (100g each) so you can discover your favorite expression of Kenyan Arabica. Perfect for gifting or personal exploration."
     }
   ];
 

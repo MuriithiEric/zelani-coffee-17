@@ -94,10 +94,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               <Button
                 size="sm"
                 onClick={handleAddToCart}
-                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900"
+                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900 flex items-center justify-center gap-1.5 whitespace-nowrap px-2"
               >
-                <ShoppingCart className="h-4 w-4 sm:mr-1" />
-                <span className="hidden sm:inline">Add to Cart</span>
+                <ShoppingCart className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs sm:text-sm truncate">Add to Cart</span>
               </Button>
             </div>
           </div>
