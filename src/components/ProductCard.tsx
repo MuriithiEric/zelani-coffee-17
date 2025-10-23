@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ShoppingCart, Coffee } from "lucide-react";
+import { ShoppingCart, Coffee, Plus, Minus } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
 
 interface Product {
   id: string;
@@ -22,29 +23,14 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
 
-  // Initialize IntaSend on component mount
-  useEffect(() => {
-    if (typeof window.IntaSend !== 'undefined') {
-      new window.IntaSend({
-        publicAPIKey: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
-        live: false
-      })
-        .on("COMPLETE", (response: any) => {
-          console.log("Payment completed:", response);
-          window.location.href = "/thank-you";
-        })
-        .on("FAILED", (response: any) => {
-          console.log("Payment failed:", response);
-          setIsProcessing(false);
-        })
-        .on("IN-PROGRESS", () => {
-          console.log("Payment in progress");
-          setIsProcessing(true);
-        });
-    }
-  }, []);
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    setIsModalOpen(false);
+    setQuantity(1);
+  };
 
   return (
     <>
@@ -107,14 +93,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               </Button>
               <Button
                 size="sm"
-                disabled={isProcessing}
-                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900 intaSendPayButton"
-                data-amount={product.price}
-                data-currency="KES"
-                data-api_ref={`zelani_${product.id}_${Date.now()}`}
+                onClick={handleAddToCart}
+                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900"
               >
                 <ShoppingCart className="h-4 w-4 mr-1" />
-                {isProcessing ? "..." : "Buy Now"}
+                Add to Cart
               </Button>
             </div>
           </div>
@@ -166,22 +149,38 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t">
-              <span className="font-playfair text-3xl font-bold text-coffee-800">
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-2xl font-bold text-gold-600">
                 KES {product.price.toLocaleString()}
               </span>
-              <Button
-                disabled={isProcessing}
-                size="lg"
-                className="bg-gold-500 hover:bg-gold-600 text-coffee-900 intaSendPayButton"
-                data-amount={product.price}
-                data-currency="KES"
-                data-api_ref={`zelani_${product.id}_${Date.now()}`}
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                {isProcessing ? "Processing..." : "Buy Now"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="h-8 w-8 p-0"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-12 text-center font-semibold">{quantity}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
+            <Button
+              onClick={handleAddToCart}
+              size="lg"
+              className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
+            >
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Add {quantity} to Cart
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

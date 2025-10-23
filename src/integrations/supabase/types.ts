@@ -14,7 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      order_items: {
+        Row: {
+          created_at: string
+          grind: string | null
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          size: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          grind?: string | null
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          size?: string | null
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          grind?: string | null
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          size?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          currency: string
+          customer_email: string | null
+          customer_phone: string | null
+          id: string
+          intasend_tracking_id: string | null
+          order_reference: string
+          payment_status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_phone?: string | null
+          id?: string
+          intasend_tracking_id?: string | null
+          order_reference: string
+          payment_status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_phone?: string | null
+          id?: string
+          intasend_tracking_id?: string | null
+          order_reference?: string
+          payment_status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

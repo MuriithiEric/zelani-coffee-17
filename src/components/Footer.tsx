@@ -1,12 +1,11 @@
 
-import { Coffee, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export const Footer = () => {
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Youtube, href: "#", label: "YouTube" }
+    { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61578138203234", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/zelanicoffee/", label: "Instagram" },
+    { icon: Twitter, href: "https://x.com/zelanicoffee", label: "X" }
   ];
 
   const footerLinks = {
@@ -23,9 +22,9 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <img 
-                src="/lovable-uploads/67d30343-8f62-4dd8-995c-f4ebbb149ca1.png" 
+                src="/lovable-uploads/zelani-logo.jpeg" 
                 alt="Zelani Coffee Logo" 
-                className="h-8 w-8"
+                className="h-12 w-12 object-contain"
               />
               <span className="font-playfair text-2xl font-bold text-cream-100">
                 Zelani Coffee

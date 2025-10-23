@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CartButton } from "@/components/Cart/CartButton";
+import { CartSheet } from "@/components/Cart/CartSheet";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const navItems = [
     { label: "Home", href: "#home" },
@@ -20,9 +23,9 @@ export const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/f6ce5f0e-3daa-4d78-ae9e-8fef11b33995.png" 
+              src="/lovable-uploads/zelani-logo.jpeg" 
               alt="Zelani Coffee Logo" 
-              className="h-10 w-10"
+              className="h-12 w-12 object-contain"
             />
             <span className="font-playfair text-2xl font-bold text-coffee-800">
               Zelani Coffee
@@ -40,10 +43,12 @@ export const Navigation = () => {
                 {item.label}
               </a>
             ))}
+            <CartButton onClick={() => setIsCartOpen(true)} />
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button and cart */}
+          <div className="md:hidden flex items-center gap-2">
+            <CartButton onClick={() => setIsCartOpen(true)} />
             <Button
               variant="ghost"
               size="sm"
@@ -73,6 +78,8 @@ export const Navigation = () => {
           </div>
         )}
       </div>
+
+      <CartSheet open={isCartOpen} onOpenChange={setIsCartOpen} />
     </nav>
   );
 };
