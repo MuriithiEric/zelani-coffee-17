@@ -3,15 +3,48 @@ import { ProductCard } from "./ProductCard";
 export const ProductsSection = () => {
   const products = [
     {
+      id: "premium-dark-roast-1kg",
+      name: "Premium Dark Roast",
+      description: "Bold and rich Arabica from Kirinyaga highlands. Our largest size for true dark roast enthusiasts.",
+      price: 2450,
+      image: "/lovable-uploads/premium-dark-roast-1kg.jpeg",
+      grind: "Whole Beans",
+      size: "1kg",
+      tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
+      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This 1kg package offers exceptional value for dark roast lovers who want to stock up on their favorite coffee. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
+    },
+    {
+      id: "premium-dark-roast-125g",
+      name: "Premium Dark Roast",
+      description: "Bold and rich Arabica from Kirinyaga highlands. Perfect starter size to discover our bold dark roast.",
+      price: 350,
+      image: "/lovable-uploads/premium-dark-roast-125g.jpeg",
+      grind: "Whole Beans",
+      size: "125g",
+      tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
+      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This compact 125g package is perfect for trying our signature dark roast or for those who prefer smaller quantities to ensure maximum freshness. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
+    },
+    {
+      id: "premium-dark-roast-500g",
+      name: "Premium Dark Roast",
+      description: "Bold and rich Arabica from Kirinyaga highlands. The ideal mid-size option for regular dark roast drinkers.",
+      price: 1250,
+      image: "/lovable-uploads/premium-dark-roast-500g.jpeg",
+      grind: "Whole Beans",
+      size: "500g",
+      tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
+      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This 500g package offers a great balance between value and freshness for regular coffee drinkers. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
+    },
+    {
       id: "premium-dark-roast-250g",
       name: "Premium Dark Roast",
-      description: "Bold and rich Arabica from Kirinyaga highlands. A full-bodied dark roast for those who love intense flavor.",
+      description: "Bold and rich Arabica from Kirinyaga highlands. The classic mid-size for everyday enjoyment.",
       price: 650,
-      image: "/lovable-uploads/4c88326b-c4a8-48f1-8877-1c643256d8bf.png",
+      image: "/lovable-uploads/premium-dark-roast-250g.jpeg",
       grind: "Whole Beans",
       size: "250g",
       tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
-      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
+      details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This versatile 250g package is perfect for everyday coffee lovers who want a balanced size that maintains freshness while providing enough coffee for daily brewing. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection, bringing out deep chocolate notes and a satisfying richness that dark roast lovers crave."
     },
     {
       id: "premium-medium-roast-1kg",
