@@ -47,6 +47,17 @@ export const ProductsSection = () => {
       details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This 500g package offers a great balance between value and freshness for regular coffee drinkers. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
     },
     {
+      id: "premium-medium-roast-250g",
+      name: "Premium Medium Roast",
+      description: "Perfectly balanced Arabica with bright, complex flavors. The classic mid-size for everyday enjoyment.",
+      price: 650,
+      image: "/lovable-uploads/premium-medium-roast-250g.jpeg",
+      grind: "Medium Ground",
+      size: "250g",
+      tastingNotes: ["Caramel", "Floral Notes", "Wine"],
+      details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This versatile 250g package is perfect for everyday coffee lovers who want a balanced size that maintains freshness while providing enough coffee for daily brewing. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans with sweet caramel notes, delicate florals, and wine-like complexity. Perfect for pour-over, drip, or French press methods."
+    },
+    {
       id: "drip-bags-10pack",
       name: "Drip Bags",
       description: "Portable single-serve drip bags. Coffee on the go, crafted with care.",
