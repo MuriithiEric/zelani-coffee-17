@@ -96,8 +96,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 onClick={handleAddToCart}
                 className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900"
               >
-                <ShoppingCart className="h-4 w-4 mr-1" />
-                Add to Cart
+                <ShoppingCart className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Add to Cart</span>
               </Button>
             </div>
           </div>

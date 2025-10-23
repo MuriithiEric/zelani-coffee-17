@@ -1,4 +1,4 @@
-import { CheckCircle, ArrowLeft, Home } from "lucide-react";
+import { CheckCircle, ArrowLeft, Home, MessageCircle, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -39,23 +39,41 @@ const ThankYou = () => {
           </ul>
         </div>
 
+        <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
+          <h2 className="font-semibold text-coffee-800 text-lg mb-4">Love Your Coffee?</h2>
+          <p className="text-coffee-600 mb-6">
+            We'd love to hear from you! Order more of your favorites or reach out to us on WhatsApp for special requests.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => navigate("/#products")}
+              size="lg"
+              className="bg-gold-500 hover:bg-gold-600 text-coffee-900"
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              Shop Again
+            </Button>
+            <Button
+              onClick={() => window.open("https://wa.me/254777405410", "_blank")}
+              variant="outline"
+              size="lg"
+              className="border-coffee-600 text-coffee-800 hover:bg-coffee-50"
+            >
+              <MessageCircle className="mr-2 h-5 w-5" />
+              Contact on WhatsApp
+            </Button>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             onClick={() => navigate("/")}
             size="lg"
-            className="bg-gold-500 hover:bg-gold-600 text-coffee-900"
+            variant="outline"
+            className="border-coffee-600 text-coffee-800"
           >
             <Home className="mr-2 h-5 w-5" />
             Return Home
-          </Button>
-          <Button
-            onClick={() => navigate("/#products")}
-            variant="outline"
-            size="lg"
-            className="border-coffee-600 text-coffee-800"
-          >
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            Continue Shopping
           </Button>
         </div>
 
