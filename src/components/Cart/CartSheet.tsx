@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ShoppingCart, X } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,6 +12,7 @@ import { useCart } from "@/hooks/useCart";
 import { CartItem } from "./CartItem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import "@/types/intasend";
 
 interface CartSheetProps {
   open: boolean;
@@ -21,58 +22,63 @@ interface CartSheetProps {
 export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
   const { items, getCartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const intasendRef = useRef<any>(null);
 
-  // Initialize IntaSend when cart opens
+  const handlePaymentComplete = useCallback(async (response: any) => {
+    console.log("Payment completed:", response);
+    
+    try {
+      const orderRef = `zelani_order_${Date.now()}`;
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          order_reference: orderRef,
+          total_amount: getCartTotal(),
+          currency: "KES",
+          payment_status: "completed",
+          intasend_tracking_id: response.tracking_id,
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.product.price,
+        grind: item.product.grind,
+        size: item.product.size,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      clearCart();
+      setIsProcessing(false);
+      window.location.href = `/thank-you?order=${orderRef}`;
+    } catch (error) {
+      console.error("Error storing order:", error);
+      toast.error("Payment successful but order storage failed");
+      setIsProcessing(false);
+    }
+  }, [items, getCartTotal, clearCart]);
+
+  // Initialize IntaSend SDK
   useEffect(() => {
-    if (open && typeof window.IntaSend !== "undefined") {
-      new window.IntaSend({
+    if (typeof window.IntaSend !== "undefined" && !intasendRef.current) {
+      intasendRef.current = new window.IntaSend({
         publicAPIKey: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
         live: false,
-      })
-        .on("COMPLETE", async (response: any) => {
-          console.log("Payment completed:", response);
-          
-          // Store order in database
-          try {
-            const orderRef = `zelani_order_${Date.now()}`;
-            const { data: order, error: orderError } = await supabase
-              .from("orders")
-              .insert({
-                order_reference: orderRef,
-                total_amount: getCartTotal(),
-                currency: "KES",
-                payment_status: "completed",
-                intasend_tracking_id: response.tracking_id,
-              })
-              .select()
-              .single();
+      });
 
-            if (orderError) throw orderError;
-
-            // Store order items
-            const orderItems = items.map((item) => ({
-              order_id: order.id,
-              product_id: item.product.id,
-              product_name: item.product.name,
-              quantity: item.quantity,
-              unit_price: item.product.price,
-              grind: item.product.grind,
-              size: item.product.size,
-            }));
-
-            const { error: itemsError } = await supabase
-              .from("order_items")
-              .insert(orderItems);
-
-            if (itemsError) throw itemsError;
-
-            clearCart();
-            window.location.href = `/thank-you?order=${orderRef}`;
-          } catch (error) {
-            console.error("Error storing order:", error);
-            toast.error("Payment successful but order storage failed");
-          }
-        })
+      intasendRef.current
+        .on("COMPLETE", handlePaymentComplete)
         .on("FAILED", (error: any) => {
           console.error("Payment failed:", error);
           toast.error("Payment failed. Please try again.");
@@ -80,10 +86,9 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
         })
         .on("IN-PROGRESS", () => {
           console.log("Payment in progress");
-          setIsProcessing(true);
         });
     }
-  }, [open, items, getCartTotal, clearCart]);
+  }, [handlePaymentComplete]);
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -91,16 +96,39 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
       return;
     }
 
-    setIsProcessing(true);
-
-    // Create order reference
-    const orderRef = `zelani_order_${Date.now()}`;
-    
-    // Trigger IntaSend payment via the button
-    const checkoutButton = document.getElementById("intasend-checkout-button");
-    if (checkoutButton) {
-      checkoutButton.click();
+    if (!window.IntaSend) {
+      toast.error("Payment system is not available. Please refresh the page.");
+      return;
     }
+
+    if (!intasendRef.current) {
+      intasendRef.current = new window.IntaSend({
+        publicAPIKey: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
+        live: false,
+      });
+
+      intasendRef.current
+        .on("COMPLETE", handlePaymentComplete)
+        .on("FAILED", (error: any) => {
+          console.error("Payment failed:", error);
+          toast.error("Payment failed. Please try again.");
+          setIsProcessing(false);
+        })
+        .on("IN-PROGRESS", () => {
+          console.log("Payment in progress");
+        });
+    }
+
+    setIsProcessing(true);
+    const total = getCartTotal();
+    const orderRef = `zelani_order_${Date.now()}`;
+
+    // Use programmatic checkout
+    intasendRef.current.checkout({
+      amount: total,
+      currency: "KES",
+      api_ref: orderRef,
+    });
   };
 
   const total = getCartTotal();
@@ -147,15 +175,6 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
               KES {total.toLocaleString()}
             </span>
           </div>
-          
-          {/* Hidden IntaSend button */}
-          <button
-            id="intasend-checkout-button"
-            className="intaSendPayButton hidden"
-            data-amount={total}
-            data-currency="KES"
-            data-api_ref={`zelani_order_${Date.now()}`}
-          />
           
           <Button
             onClick={handleCheckout}
