@@ -72,7 +72,7 @@ export const ProductsSection = () => {
       id: "premium-medium-roast-500g",
       name: "Premium Medium Roast",
       description: "Perfectly balanced Arabica with bright, complex flavors. The ideal mid-size option for regular coffee drinkers.",
-      price: 1250,
+      price: 1400,
       image: "/lovable-uploads/premium-medium-roast-500g.jpeg",
       grind: "Medium Ground",
       size: "500g",
