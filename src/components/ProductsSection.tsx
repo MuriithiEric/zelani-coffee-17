@@ -39,7 +39,7 @@ export const ProductsSection = () => {
       id: "premium-dark-roast-250g",
       name: "Premium Dark Roast",
       description: "Bold and rich Arabica from Kirinyaga highlands. The classic mid-size for everyday enjoyment.",
-      price: 650,
+      price: 750,
       image: "/lovable-uploads/premium-dark-roast-250g.jpeg",
       grind: "Whole Beans",
       size: "250g",
