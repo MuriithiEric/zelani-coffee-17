@@ -28,7 +28,7 @@ export const ProductsSection = () => {
       id: "premium-dark-roast-500g",
       name: "Premium Dark Roast",
       description: "Bold and rich Arabica from Kirinyaga highlands. The ideal mid-size option for regular dark roast drinkers.",
-      price: 1250,
+      price: 1400,
       image: "/lovable-uploads/premium-dark-roast-500g.jpeg",
       grind: "Whole Beans",
       size: "500g",
