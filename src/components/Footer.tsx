@@ -74,7 +74,7 @@ export const Footer = () => {
                 {links.map((link) => (
                   <li key={link}>
                     <a
-                      href="#"
+                      href={category === "Coffee" ? "#products" : category === "About" ? "#story" : "#contact"}
                       className="text-cream-200 hover:text-gold-400 transition-colors duration-200"
                     >
                       {link}
