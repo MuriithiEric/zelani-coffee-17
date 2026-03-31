@@ -25,9 +25,9 @@ export const Footer = () => {
   ];
 
   const footerLinks = {
-    "Coffee": ["Kenyan Arabica", "Premium Blends", "Single Origin", "Fair Trade"],
-    "About": ["Our Story", "Farm to Cup", "Sustainability", "Farmers"],
-    "Support": ["Contact Us", "FAQ", "Shipping Info", "Returns"]
+    "Coffee": ["Premium Dark Roast", "Premium Medium Roast"],
+    "About": ["Our Story"],
+    "Support": ["Contact Us"]
   };
 
   return (
@@ -74,7 +74,7 @@ export const Footer = () => {
                 {links.map((link) => (
                   <li key={link}>
                     <a
-                      href="#"
+                      href={category === "Coffee" ? "#products" : category === "About" ? "#story" : "#contact"}
                       className="text-cream-200 hover:text-gold-400 transition-colors duration-200"
                     >
                       {link}
