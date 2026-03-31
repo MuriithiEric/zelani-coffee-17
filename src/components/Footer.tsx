@@ -25,9 +25,9 @@ export const Footer = () => {
   ];
 
   const footerLinks = {
-    "Coffee": ["Kenyan Arabica", "Premium Blends", "Single Origin", "Fair Trade"],
-    "About": ["Our Story", "Farm to Cup", "Sustainability", "Farmers"],
-    "Support": ["Contact Us", "FAQ", "Shipping Info", "Returns"]
+    "Coffee": ["Premium Dark Roast", "Premium Medium Roast"],
+    "About": ["Our Story"],
+    "Support": ["Contact Us"]
   };
 
   return (
