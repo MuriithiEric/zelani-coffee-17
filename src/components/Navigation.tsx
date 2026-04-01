@@ -37,15 +37,25 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-foreground hover:text-coffee-600 transition-colors duration-200 font-medium"
-              >
-                {item.label}
-              </a>
-            ))}
+            {navItems.map((item) =>
+              (item as any).isRoute ? (
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.href)}
+                  className="text-foreground hover:text-coffee-600 transition-colors duration-200 font-medium"
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-foreground hover:text-coffee-600 transition-colors duration-200 font-medium"
+                >
+                  {item.label}
+                </a>
+              )
+            )}
             <CartButton onClick={() => setIsCartOpen(true)} />
           </div>
 
