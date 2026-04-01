@@ -14,6 +14,7 @@ export const Navigation = () => {
     { label: "Products", href: "#products" },
     { label: "Impact", href: "#impact" },
     { label: "Contact", href: "#contact" },
+    { label: "Track Order", href: "/track", isRoute: true },
   ];
 
   return (
