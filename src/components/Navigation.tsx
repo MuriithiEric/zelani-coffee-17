@@ -8,6 +8,7 @@ import { CartSheet } from "@/components/Cart/CartSheet";
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { label: "Home", href: "#home" },
