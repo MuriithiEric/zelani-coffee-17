@@ -1,4 +1,4 @@
-import { CheckCircle, ArrowLeft, Home, MessageCircle, ShoppingBag } from "lucide-react";
+import { CheckCircle, Home, MessageCircle, ShoppingBag, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -37,6 +37,26 @@ const ThankYou = () => {
               Expect delivery within 3-5 business days in Kenya
             </li>
           </ul>
+        </div>
+
+        {/* Track Your Order Section */}
+        <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-gold-100 rounded-full mb-4">
+            <Truck className="h-6 w-6 text-gold-700" />
+          </div>
+          <h2 className="font-semibold text-coffee-800 text-lg mb-4">Track Your Order</h2>
+          <p className="text-coffee-600 mb-6">
+            Once your order is dispatched, you will receive a DHL waybill number via email. 
+            Use it on our tracking page to follow your shipment in real time.
+          </p>
+          <Button
+            onClick={() => navigate("/track")}
+            size="lg"
+            className="bg-gold-500 hover:bg-gold-600 text-coffee-900"
+          >
+            <Truck className="mr-2 h-5 w-5" />
+            Track My Shipment
+          </Button>
         </div>
 
         <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
