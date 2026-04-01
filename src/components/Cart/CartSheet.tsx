@@ -8,91 +8,141 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCart } from "@/hooks/useCart";
 import { CartItem } from "./CartItem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 interface CartSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const KES_TO_USD = 0.0077; // approximate conversion
+
+const EAST_AFRICA = ["UG", "TZ", "RW", "ET"];
+
+const COUNTRIES = [
+  { code: "KE", name: "Kenya" },
+  { code: "UG", name: "Uganda" },
+  { code: "TZ", name: "Tanzania" },
+  { code: "RW", name: "Rwanda" },
+  { code: "ET", name: "Ethiopia" },
+  { code: "US", name: "United States" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "ZA", name: "South Africa" },
+  { code: "NG", name: "Nigeria" },
+  { code: "GH", name: "Ghana" },
+  { code: "IN", name: "India" },
+  { code: "CN", name: "China" },
+  { code: "JP", name: "Japan" },
+  { code: "SG", name: "Singapore" },
+  { code: "NL", name: "Netherlands" },
+  { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" },
+  { code: "CH", name: "Switzerland" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "BR", name: "Brazil" },
+  { code: "OTHER", name: "Other Country" },
+];
+
+function getShippingInfo(countryCode: string) {
+  if (countryCode === "KE") {
+    return { label: "Delivery within Kenya", cost: 500, currency: "KES" as const };
+  }
+  if (EAST_AFRICA.includes(countryCode)) {
+    return { label: "Regional Shipping (East Africa)", cost: 2000, currency: "KES" as const };
+  }
+  return { label: "International Shipping via DHL Express", cost: 35, currency: "USD" as const };
+}
+
+function formatPrice(amount: number, currency: "KES" | "USD") {
+  return `${currency} ${amount.toLocaleString(undefined, { minimumFractionDigits: currency === "USD" ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
 export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
   const { items, getCartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [country, setCountry] = useState<string>("");
 
+  const productTotalKES = getCartTotal();
+  const shipping = country ? getShippingInfo(country) : null;
+  const isInternational = shipping?.currency === "USD";
+
+  const productSubtotal = isInternational
+    ? Math.round(productTotalKES * KES_TO_USD * 100) / 100
+    : productTotalKES;
+
+  const shippingCost = shipping?.cost ?? 0;
+  const orderTotal = productSubtotal + shippingCost;
+  const displayCurrency: "KES" | "USD" = isInternational ? "USD" : "KES";
 
   const handleCheckout = async () => {
-    console.log("[IntaSend Debug] === CHECKOUT BUTTON CLICKED ===");
-    console.log("[IntaSend Debug] Cart items:", items);
-    console.log("[IntaSend Debug] Items count:", items.length);
-    
     if (items.length === 0) {
-      console.log("[IntaSend Debug] Cart is empty, aborting");
       toast.error("Your cart is empty");
       return;
     }
 
+    if (!country) {
+      toast.error("Please select your country to continue");
+      return;
+    }
+
     setIsProcessing(true);
-    const total = getCartTotal();
     const orderRef = `zelani_order_${Date.now()}`;
 
-    console.log("[IntaSend Debug] === INITIATING CHECKOUT API CALL ===");
-    console.log("[IntaSend Debug] Total amount:", total);
-    console.log("[IntaSend Debug] Order reference:", orderRef);
-
     try {
-      // Call IntaSend Checkout API directly
       const payload = {
         public_key: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
-        amount: total,
-        currency: "KES",
+        amount: orderTotal,
+        currency: displayCurrency,
         api_ref: orderRef,
         redirect_url: `${window.location.origin}/thank-you?order=${orderRef}`,
       };
-      
-      console.log("[IntaSend Debug] API payload:", payload);
-      
+
       const response = await fetch("https://sandbox.intasend.com/api/v1/checkout/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      
-      console.log("[IntaSend Debug] API response status:", response.status);
-      
+
       const data = await response.json();
-      console.log("[IntaSend Debug] API response data:", data);
-      
+
       if (data.url) {
-        console.log("[IntaSend Debug] Redirecting to checkout URL:", data.url);
-        
-        // Store order in database before redirecting
         const orderData = {
           order_reference: orderRef,
-          total_amount: total,
-          currency: "KES",
+          total_amount: orderTotal,
+          currency: displayCurrency,
           payment_status: "pending",
           intasend_tracking_id: data.id || null,
         };
-        
+
         const { error: orderError } = await supabase
           .from("orders")
           .insert(orderData);
 
-        if (orderError) {
-          console.error("[IntaSend Debug] Order creation error:", orderError);
-        } else {
-          // Store order items
+        if (!orderError) {
           const orderResult = await supabase
             .from("orders")
             .select("id")
             .eq("order_reference", orderRef)
             .single();
-          
+
           if (orderResult.data) {
             const orderItems = items.map((item) => ({
               order_id: orderResult.data.id,
@@ -103,27 +153,21 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
               grind: item.product.grind,
               size: item.product.size,
             }));
-            
             await supabase.from("order_items").insert(orderItems);
           }
         }
-        
-        // Clear cart and redirect to IntaSend checkout
+
         clearCart();
         window.location.href = data.url;
       } else {
-        console.error("[IntaSend Debug] No checkout URL in response:", data);
         toast.error("Failed to create checkout session");
         setIsProcessing(false);
       }
-    } catch (error) {
-      console.error("[IntaSend Debug] API call error:", error);
+    } catch {
       toast.error("Failed to initiate payment");
       setIsProcessing(false);
     }
   };
-
-  const total = getCartTotal();
 
   if (items.length === 0) {
     return (
@@ -154,23 +198,73 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
           <SheetTitle>Shopping Cart ({items.length} items)</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto py-4 space-y-4">
           {items.map((item) => (
             <CartItem key={item.product.id} item={item} />
           ))}
+
+          {/* Country selector */}
+          <div className="pt-2">
+            <label className="text-sm font-medium text-foreground mb-1.5 block">
+              Shipping Country <span className="text-destructive">*</span>
+            </label>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select your country" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <SheetFooter className="flex-col space-y-4 border-t border-border pt-4">
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold">Total:</span>
-            <span className="text-2xl font-bold text-gold-600">
-              KES {total.toLocaleString()}
-            </span>
-          </div>
-          
+        <SheetFooter className="flex-col space-y-3 border-t border-border pt-4">
+          {!country ? (
+            <p className="text-sm text-muted-foreground text-center py-2">
+              Select your country to see shipping costs
+            </p>
+          ) : (
+            <>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Products Subtotal</span>
+                <span className="text-foreground">
+                  {formatPrice(productSubtotal, displayCurrency)}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-sm">
+                <div>
+                  <span className="text-muted-foreground">{shipping!.label}</span>
+                  {isInternational && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Estimated 3–5 business days via DHL Express
+                    </p>
+                  )}
+                </div>
+                <span className="text-foreground">
+                  {formatPrice(shippingCost, displayCurrency)}
+                </span>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold">Total</span>
+                <span className="text-2xl font-bold text-gold-600">
+                  {formatPrice(orderTotal, displayCurrency)}
+                </span>
+              </div>
+            </>
+          )}
+
           <Button
             onClick={handleCheckout}
-            disabled={isProcessing}
+            disabled={isProcessing || !country}
             size="lg"
             className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
           >

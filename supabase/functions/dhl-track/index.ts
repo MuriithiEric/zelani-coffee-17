@@ -8,7 +8,7 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   if (req.method !== "POST") {
@@ -28,31 +28,39 @@ serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get("DHL_API_KEY");
-    if (!apiKey) {
+    const username = Deno.env.get("DHL_USERNAME");
+    const password = Deno.env.get("DHL_PASSWORD");
+
+    if (!username || !password) {
       return new Response(
-        JSON.stringify({ error: "DHL API key not configured" }),
+        JSON.stringify({ error: "DHL credentials not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const dhlUrl = `https://api.dhl.com/track/shipments?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+    const credentials = btoa(`${username}:${password}`);
 
-    const dhlResponse = await fetch(dhlUrl, {
-      headers: {
-        "DHL-API-Key": apiKey,
-      },
-    });
+    const response = await fetch(
+      `https://express.api.dhl.com/mydhlapi/test/tracking?shipmentTrackingNumber=${encodeURIComponent(trackingNumber)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${credentials}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const data = await dhlResponse.json();
+    const data = await response.json();
 
     return new Response(JSON.stringify(data), {
-      status: dhlResponse.status,
+      status: response.status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: "Failed to track shipment" }),
+      JSON.stringify({ error: error.message || "Failed to track shipment" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
