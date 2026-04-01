@@ -77,16 +77,26 @@ export const Navigation = () => {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-background border-t border-border">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="block px-3 py-2 text-foreground hover:text-coffee-600 transition-colors duration-200"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
+              {navItems.map((item) =>
+                (item as any).isRoute ? (
+                  <button
+                    key={item.label}
+                    onClick={() => { navigate(item.href); setIsOpen(false); }}
+                    className="block w-full text-left px-3 py-2 text-foreground hover:text-coffee-600 transition-colors duration-200"
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="block px-3 py-2 text-foreground hover:text-coffee-600 transition-colors duration-200"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                )
+              )}
             </div>
           </div>
         )}
