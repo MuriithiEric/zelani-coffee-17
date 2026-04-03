@@ -1,5 +1,6 @@
 
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Custom TikTok Icon Component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -16,6 +17,8 @@ const YouTubeIcon = ({ className }: { className?: string }) => (
 );
 
 export const Footer = () => {
+  const navigate = useNavigate();
+
   const socialLinks = [
     { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61578138203234", label: "Facebook" },
     { icon: Instagram, href: "https://www.instagram.com/zelanicoffee/", label: "Instagram" },
@@ -24,11 +27,36 @@ export const Footer = () => {
     { icon: YouTubeIcon, href: "https://www.youtube.com/@zelanicoffee", label: "YouTube" }
   ];
 
-  const footerLinks = {
-    "Coffee": ["Premium Dark Roast", "Premium Medium Roast"],
-    "About": ["Our Story"],
-    "Support": ["Contact Us"]
+  const handleScrollLink = (hash: string) => {
+    const id = hash.replace("#", "");
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
+
+  const footerSections = [
+    {
+      title: "Coffee",
+      links: [
+        { label: "Premium Dark Roast", action: () => handleScrollLink("#products") },
+        { label: "Premium Medium Roast", action: () => handleScrollLink("#products") },
+      ],
+    },
+    {
+      title: "About",
+      links: [
+        { label: "Our Story", action: () => handleScrollLink("#story") },
+      ],
+    },
+    {
+      title: "Support",
+      links: [
+        { label: "Contact Us", action: () => handleScrollLink("#contact") },
+        { label: "Track Order", action: () => navigate("/track") },
+      ],
+    },
+  ];
 
   return (
     <footer className="bg-coffee-900 text-cream-100">
@@ -67,18 +95,18 @@ export const Footer = () => {
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="font-semibold text-cream-100 mb-4">{category}</h3>
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h3 className="font-semibold text-cream-100 mb-4">{section.title}</h3>
               <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href={category === "Coffee" ? "#products" : category === "About" ? "#story" : "#contact"}
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <button
+                      onClick={link.action}
                       className="text-cream-200 hover:text-gold-400 transition-colors duration-200"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -91,11 +119,11 @@ export const Footer = () => {
             © 2025 Zelani Coffee. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-cream-200 hover:text-gold-400 text-sm transition-colors duration-200">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-cream-200 hover:text-gold-400 text-sm transition-colors duration-200">
-              Terms of Service
+            <a
+              href="mailto:muraypatrick@gmail.com"
+              className="text-cream-200 hover:text-gold-400 text-sm transition-colors duration-200"
+            >
+              muraypatrick@gmail.com
             </a>
           </div>
         </div>

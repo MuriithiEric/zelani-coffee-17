@@ -20,13 +20,14 @@ import { CartItem } from "./CartItem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 
 interface CartSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const KES_TO_USD = 0.0077; // approximate conversion
+const KES_TO_USD = 0.0077;
 
 const EAST_AFRICA = ["UG", "TZ", "RW", "ET"];
 
@@ -77,8 +78,9 @@ function formatPrice(amount: number, currency: "KES" | "USD") {
 
 export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
   const { items, getCartTotal, clearCart } = useCart();
-  const [isProcessing, setIsProcessing] = useState(false);
   const [country, setCountry] = useState<string>("");
+  const [paypalRedirected, setPaypalRedirected] = useState(false);
+  const navigate = useNavigate();
 
   const productTotalKES = getCartTotal();
   const shipping = country ? getShippingInfo(country) : null;
@@ -92,84 +94,70 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
   const orderTotal = productSubtotal + shippingCost;
   const displayCurrency: "KES" | "USD" = isInternational ? "USD" : "KES";
 
-  const handleCheckout = async () => {
+  const handlePayNow = async () => {
     if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
-
     if (!country) {
       toast.error("Please select your country to continue");
       return;
     }
 
-    setIsProcessing(true);
+    // Save order to database
     const orderRef = `zelani_order_${Date.now()}`;
-
     try {
-      const payload = {
-        public_key: "ISPubKey_test_732bfd7f-a0e1-4845-9a65-47d8385684eb",
-        amount: orderTotal,
+      const { error: orderError } = await supabase.from("orders").insert({
+        order_reference: orderRef,
+        total_amount: orderTotal,
         currency: displayCurrency,
-        api_ref: orderRef,
-        redirect_url: `${window.location.origin}/thank-you?order=${orderRef}`,
-      };
-
-      const response = await fetch("https://sandbox.intasend.com/api/v1/checkout/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        payment_status: "pending",
+        customer_email: "muraypatrick@gmail.com",
       });
 
-      const data = await response.json();
-
-      if (data.url) {
-        const orderData = {
-          order_reference: orderRef,
-          total_amount: orderTotal,
-          currency: displayCurrency,
-          payment_status: "pending",
-          intasend_tracking_id: data.id || null,
-        };
-
-        const { error: orderError } = await supabase
+      if (!orderError) {
+        const orderResult = await supabase
           .from("orders")
-          .insert(orderData);
+          .select("id")
+          .eq("order_reference", orderRef)
+          .single();
 
-        if (!orderError) {
-          const orderResult = await supabase
-            .from("orders")
-            .select("id")
-            .eq("order_reference", orderRef)
-            .single();
-
-          if (orderResult.data) {
-            const orderItems = items.map((item) => ({
-              order_id: orderResult.data.id,
-              product_id: item.product.id,
-              product_name: item.product.name,
-              quantity: item.quantity,
-              unit_price: item.product.price,
-              grind: item.product.grind,
-              size: item.product.size,
-            }));
-            await supabase.from("order_items").insert(orderItems);
-          }
+        if (orderResult.data) {
+          const orderItems = items.map((item) => ({
+            order_id: orderResult.data.id,
+            product_id: item.product.id,
+            product_name: item.product.name,
+            quantity: item.quantity,
+            unit_price: item.product.price,
+            grind: item.product.grind,
+            size: item.product.size,
+          }));
+          await supabase.from("order_items").insert(orderItems);
         }
-
-        clearCart();
-        window.location.href = data.url;
-      } else {
-        toast.error("Failed to create checkout session");
-        setIsProcessing(false);
       }
     } catch {
-      toast.error("Failed to initiate payment");
-      setIsProcessing(false);
+      // Non-blocking — order recording is best-effort
     }
+
+    // Build PayPal.me link
+    const totalForPaypal = displayCurrency === "USD"
+      ? orderTotal.toFixed(2).replace(/\.?0+$/, "")
+      : Math.round(orderTotal).toString();
+
+    const paypalUrl = `https://www.paypal.com/paypalme/muraypatrick/${totalForPaypal}${displayCurrency}`;
+    window.open(paypalUrl, "_blank");
+    setPaypalRedirected(true);
   };
 
-  if (items.length === 0) {
+  const handlePaymentComplete = () => {
+    clearCart();
+    onOpenChange(false);
+    setPaypalRedirected(false);
+    setCountry("");
+    navigate("/thank-you");
+  };
+
+  if (items.length === 0 && !paypalRedirected) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="w-full sm:max-w-lg">
@@ -224,52 +212,73 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
         </div>
 
         <SheetFooter className="flex-col space-y-3 border-t border-border pt-4">
-          {!country ? (
-            <p className="text-sm text-muted-foreground text-center py-2">
-              Select your country to see shipping costs
-            </p>
+          {paypalRedirected ? (
+            <div className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                You've been redirected to PayPal to complete your payment.
+                Once payment is confirmed, return here and click
+                "I've Completed Payment" to receive your order confirmation.
+              </p>
+              <Button
+                onClick={handlePaymentComplete}
+                size="lg"
+                className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
+              >
+                I've Completed Payment
+              </Button>
+            </div>
           ) : (
             <>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Products Subtotal</span>
-                <span className="text-foreground">
-                  {formatPrice(productSubtotal, displayCurrency)}
-                </span>
-              </div>
+              {!country ? (
+                <p className="text-sm text-muted-foreground text-center py-2">
+                  Select your country to see shipping costs
+                </p>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Products Subtotal</span>
+                    <span className="text-foreground">
+                      {formatPrice(productSubtotal, displayCurrency)}
+                    </span>
+                  </div>
 
-              <div className="flex justify-between items-center text-sm">
-                <div>
-                  <span className="text-muted-foreground">{shipping!.label}</span>
-                  {isInternational && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Estimated 3–5 business days via DHL Express
-                    </p>
-                  )}
-                </div>
-                <span className="text-foreground">
-                  {formatPrice(shippingCost, displayCurrency)}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <div>
+                      <span className="text-muted-foreground">{shipping!.label}</span>
+                      {isInternational && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Estimated 3–5 business days via DHL Express
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-foreground">
+                      {formatPrice(shippingCost, displayCurrency)}
+                    </span>
+                  </div>
 
-              <Separator />
+                  <Separator />
 
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total</span>
-                <span className="text-2xl font-bold text-gold-600">
-                  {formatPrice(orderTotal, displayCurrency)}
-                </span>
-              </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">Total</span>
+                    <span className="text-2xl font-bold text-gold-600">
+                      {formatPrice(orderTotal, displayCurrency)}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              <Button
+                onClick={handlePayNow}
+                disabled={!country}
+                size="lg"
+                className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
+              >
+                {country
+                  ? `Pay ${formatPrice(orderTotal, displayCurrency)}`
+                  : "Proceed to Checkout"}
+              </Button>
             </>
           )}
-
-          <Button
-            onClick={handleCheckout}
-            disabled={isProcessing || !country}
-            size="lg"
-            className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
-          >
-            {isProcessing ? "Processing..." : "Proceed to Checkout"}
-          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
