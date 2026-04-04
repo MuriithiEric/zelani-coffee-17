@@ -139,12 +139,16 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
       // Non-blocking — order recording is best-effort
     }
 
-    // Build PayPal.me link
+    // Build PayPal standard purchase link
     const totalForPaypal = displayCurrency === "USD"
-      ? orderTotal.toFixed(2).replace(/\.?0+$/, "")
+      ? orderTotal.toFixed(2)
       : Math.round(orderTotal).toString();
 
-    const paypalUrl = `https://www.paypal.com/paypalme/muraypatrick/${totalForPaypal}${displayCurrency}`;
+    const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick` +
+      `&business=muraypatrick@gmail.com` +
+      `&amount=${totalForPaypal}` +
+      `&currency_code=${displayCurrency}` +
+      `&item_name=Zelani+Coffee+Order`;
     window.open(paypalUrl, "_blank");
     setPaypalRedirected(true);
   };
