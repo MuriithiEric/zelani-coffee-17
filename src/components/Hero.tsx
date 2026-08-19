@@ -1,72 +1,74 @@
-import { ArrowRight } from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
-  const scrollToProducts = () => {
-    const productsSection = document.getElementById('products');
-    if (productsSection) {
-      productsSection.scrollIntoView({ behavior: 'smooth' });
+  const scrollToMenu = () => {
+    const menuSection = document.getElementById("menu");
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background with coffee image */}
+    <section id="home" className="relative min-h-screen pt-24 pb-16 flex items-center justify-center overflow-hidden">
+      {/* Background Image with Blurred Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/lovable-uploads/f42a61be-a3d1-4468-969e-6f230e8f47e9.png"
-          alt="Zelani Coffee - Premium Kenyan Arabica"
+          src="https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&q=80&w=1600"
+          alt="Premium Coffee Beans Background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-coffee-900/80 via-coffee-800/60 to-coffee-700/40"></div>
+        <div className="absolute inset-0 bg-[#faf9f6]/95 lg:bg-gradient-to-r lg:from-[#faf9f6]/98 lg:via-[#faf9f6]/90 lg:to-[#faf9f6]/60 backdrop-blur-[6px]"></div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="font-playfair text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
-            Coffee for the
-            <span className="block text-gradient">Curious Nomad</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-cream-100 mb-8 max-w-2xl mx-auto animate-fade-in">
-            Born in Kirinyaga, roasted for adventure. 100% Kenyan Arabica 
-            crafted with purpose and ethical sourcing.
-          </p>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
 
-          <div className="flex justify-center animate-scale-in">
-            <Button 
-              size="lg"
-              onClick={scrollToProducts}
-              className="bg-gold-500 hover:bg-gold-600 text-coffee-900 font-semibold px-8 py-3 text-lg hover-lift"
-            >
-              Shop Now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+          {/* Left Column: Heading and Actions */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6 lg:pr-8">
+            <div className="flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-4 py-1.5 rounded-full border border-zinc-200/50 shadow-sm">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <span className="text-xs font-semibold tracking-wider text-zinc-700 uppercase">
+                Best Coffee in Town
+              </span>
+            </div>
+
+            <h1 className="font-fredoka text-5xl sm:text-6xl md:text-7xl font-bold text-zinc-900 leading-[1.08] tracking-tight relative">
+              Zelani <br />
+              <span className="text-zinc-800">Delicious</span> <br />
+              <span className="relative inline-block">
+                Coffee
+                <span className="absolute -right-12 top-2 md:top-4 bg-amber-100 border border-amber-300/40 text-amber-800 rounded-full w-10 h-10 flex items-center justify-center text-xs font-bold font-playfair italic shadow-sm">
+                  100%
+                </span>
+              </span>
+            </h1>
+
+            <p className="text-zinc-700 font-inter text-base sm:text-lg max-w-lg leading-relaxed font-medium">
+              A slice of heaven. Buy Zelani Coffee from the convenience of your own home and office.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2">
+              <Button
+                onClick={scrollToMenu}
+                size="lg"
+                className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-full px-8 py-6 text-sm font-semibold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                ORDER NOW
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-transparent border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 text-zinc-700 rounded-full px-8 py-6 text-sm font-semibold tracking-wider transition-all duration-200"
+              >
+                BOOK A TABLE
+              </Button>
+            </div>
           </div>
 
-          {/* Floating coffee stats */}
-          <div className="grid grid-cols-3 gap-8 mt-16 animate-float">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-gold-400 font-playfair">100%</div>
-              <div className="text-cream-200 text-sm md:text-base">Kenyan Arabica</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-gold-400 font-playfair">Kirinyaga</div>
-              <div className="text-cream-200 text-sm md:text-base">Highlands</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-gold-400 font-playfair">Ethical</div>
-              <div className="text-cream-200 text-sm md:text-base">Sourcing</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-cream-200 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-cream-200 rounded-full mt-2 animate-pulse"></div>
+
+
         </div>
       </div>
     </section>

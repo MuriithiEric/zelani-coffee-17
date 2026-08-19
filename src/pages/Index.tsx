@@ -1,30 +1,28 @@
 
-import { Hero } from "@/components/Hero";
 import { Navigation } from "@/components/Navigation";
-import { StorySection } from "@/components/StorySection";
+import { Hero } from "@/components/Hero";
+import { ExploreSection } from "@/components/ExploreSection";
+import { FavouriteCoffeeSection } from "@/components/FavouriteCoffeeSection";
+import { InstantCoffeeSection } from "@/components/InstantCoffeeSection";
+import { CustomerReviewsSection } from "@/components/CustomerReviewsSection";
 import { ProductsSection } from "@/components/ProductsSection";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { MissionBanner } from "@/components/MissionBanner";
-import { ImpactSection } from "@/components/ImpactSection";
-import { InstagramCTA } from "@/components/InstagramCTA";
-import { ContactSection } from "@/components/ContactSection";
+import { ContactForm } from "@/components/ContactForm";
+import { BestSellingSection } from "@/components/BestSellingSection";
 import { Footer } from "@/components/Footer";
-import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-inter">
       <Navigation />
       <Hero />
-      <StorySection />
+      <ExploreSection />
+      <FavouriteCoffeeSection />
+      <InstantCoffeeSection />
+      <CustomerReviewsSection />
       <ProductsSection />
-      <TestimonialsSection />
-      <MissionBanner />
-      <ImpactSection />
-      <InstagramCTA />
-      <ContactSection />
+      <ContactForm />
+      <BestSellingSection />
       <Footer />
-      <WhatsAppFloat />
     </div>
   );
 };

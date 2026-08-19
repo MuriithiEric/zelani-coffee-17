@@ -7,35 +7,35 @@
 
 @layer base {
   :root {
-    --background: 25 20% 96%;
-    --foreground: 30 15% 15%;
+    --background: 40 20% 98%;
+    --foreground: 40 10% 12%;
 
-    --card: 25 20% 98%;
-    --card-foreground: 30 15% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 60 8% 9%;
 
-    --popover: 25 20% 98%;
-    --popover-foreground: 30 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 8% 9%;
 
-    --primary: 30 45% 25%;
-    --primary-foreground: 25 20% 96%;
+    --primary: 60 8% 9%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 25% 88%;
-    --secondary-foreground: 30 15% 25%;
+    --secondary: 60 6% 93%;
+    --secondary-foreground: 60 6% 12%;
 
-    --muted: 35 25% 92%;
-    --muted-foreground: 30 10% 45%;
+    --muted: 60 6% 93%;
+    --muted-foreground: 60 3% 42%;
 
-    --accent: 40 50% 75%;
-    --accent-foreground: 30 15% 15%;
+    --accent: 82 85% 48%;
+    --accent-foreground: 60 8% 9%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 25 20% 96%;
 
-    --border: 35 25% 88%;
-    --input: 35 25% 88%;
-    --ring: 30 45% 25%;
+    --border: 60 6% 88%;
+    --input: 60 6% 88%;
+    --ring: 60 8% 9%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
 
   * {
@@ -58,7 +58,7 @@
   }
   
   .coffee-shadow {
-    box-shadow: 0 10px 40px rgba(139, 90, 60, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   }
   
   .hover-lift {

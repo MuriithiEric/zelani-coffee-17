@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ShoppingCart, Coffee, Plus, Minus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Product {
   id: string;
@@ -22,168 +20,65 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-    setIsModalOpen(false);
-    setQuantity(1);
+    addToCart(product as any, 1);
   };
 
   return (
-    <>
-      <Card className="overflow-hidden hover-lift coffee-shadow border-0">
-        <div className="relative">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-64 object-cover"
-          />
-          <div className="absolute top-4 right-4 bg-gold-500 text-coffee-900 px-3 py-1 rounded-full text-sm font-semibold">
-            {product.grind}
-          </div>
+    <div className="bg-zinc-50/50 hover:bg-white border border-zinc-100 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-stretch group hover:translate-y-[-4px]">
+      
+      {/* Header Row: Grind and Rating */}
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-[10px] font-semibold px-2.5 py-1 bg-white border border-zinc-150 rounded-full text-zinc-650 tracking-wider uppercase">
+          {product.grind}
+        </span>
+        <div className="flex items-center space-x-1">
+          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+          <span className="text-xs font-bold text-zinc-700">4.9</span>
         </div>
-        
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between mb-3">
-            <h3 className="font-playfair text-xl font-semibold text-coffee-800">
-              {product.name}
-            </h3>
-            <Coffee className="h-5 w-5 text-gold-600 flex-shrink-0 ml-2" />
-          </div>
-          
-          <p className="text-coffee-600 mb-3 text-sm leading-relaxed line-clamp-2">
-            {product.description}
-          </p>
+      </div>
 
-          <div className="flex gap-2 mb-3">
-            <span className="text-xs px-2 py-1 bg-cream-200 text-coffee-700 rounded-full">
-              {product.size}
-            </span>
-          </div>
+      {/* Product Image Link */}
+      <Link to={`/product/${product.id}`} className="relative flex justify-center items-center h-48 mb-6 overflow-hidden rounded-2xl">
+        <div className="absolute w-32 h-32 bg-zinc-100/50 rounded-full blur-xl group-hover:scale-125 transition-transform duration-300" />
+        <img
+          src={product.image}
+          alt={product.name}
+          className="relative z-10 max-h-full w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+        />
+        <span className="absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 bg-zinc-900 text-white rounded-full">
+          {product.size}
+        </span>
+      </Link>
 
-          <div className="mb-4">
-            <p className="text-xs text-coffee-500 mb-1 font-medium">Tasting Notes:</p>
-            <div className="flex flex-wrap gap-1">
-              {product.tastingNotes.map((note, idx) => (
-                <span key={idx} className="text-xs text-coffee-600 italic">
-                  {note}{idx < product.tastingNotes.length - 1 ? " •" : ""}
-                </span>
-              ))}
-            </div>
-          </div>
+      {/* Title & Description */}
+      <div className="space-y-2 flex-grow">
+        <Link to={`/product/${product.id}`}>
+          <h3 className="font-fredoka text-xl font-bold text-zinc-900 hover:text-zinc-600 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+        <p className="text-zinc-500 text-xs font-inter leading-relaxed line-clamp-2">
+          {product.description}
+        </p>
+      </div>
 
-          <div className="space-y-3 pt-3 border-t border-cream-300">
-            <div className="flex items-center justify-between">
-              <span className="font-playfair text-2xl font-bold text-coffee-800">
-                KES {product.price.toLocaleString()}
-              </span>
-            </div>
-            
-            <div className="flex gap-2 w-full">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsModalOpen(true)}
-                className="flex-1 border-gold-600 text-gold-700 hover:bg-gold-50"
-              >
-                Learn More
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleAddToCart}
-                className="flex-1 bg-gold-500 hover:bg-gold-600 text-coffee-900 flex items-center justify-center gap-1.5 whitespace-nowrap px-2"
-              >
-                <ShoppingCart className="h-4 w-4 flex-shrink-0" />
-                <span className="text-xs sm:text-sm truncate">Add to Cart</span>
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Footer Row: Price & Buy Button */}
+      <div className="flex justify-between items-center pt-6 mt-6 border-t border-zinc-100/50">
+        <span className="font-fredoka text-xl font-bold text-zinc-900">
+          {formatPrice(product.price, true)}
+        </span>
+        <button
+          onClick={handleAddToCart}
+          className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider transition-all duration-200 shadow-sm"
+        >
+          ORDER NOW
+        </button>
+      </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-playfair text-3xl text-coffee-800">
-              {product.name}
-            </DialogTitle>
-            <DialogDescription className="text-base text-coffee-600 pt-2">
-              {product.description}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-64 object-cover rounded-lg"
-            />
-            
-            <div>
-              <h4 className="font-semibold text-coffee-800 mb-2">Product Details</h4>
-              <p className="text-coffee-600 leading-relaxed">{product.details}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-semibold text-coffee-800 mb-2">Grind Type</h4>
-                <p className="text-coffee-600">{product.grind}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-coffee-800 mb-2">Size</h4>
-                <p className="text-coffee-600">{product.size}</p>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-coffee-800 mb-2">Tasting Notes</h4>
-              <div className="flex flex-wrap gap-2">
-                {product.tastingNotes.map((note, idx) => (
-                  <span key={idx} className="px-3 py-1 bg-cream-200 text-coffee-700 rounded-full text-sm">
-                    {note}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-2xl font-bold text-gold-600">
-                KES {product.price.toLocaleString()}
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="h-8 w-8 p-0"
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-12 text-center font-semibold">{quantity}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="h-8 w-8 p-0"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <Button
-              onClick={handleAddToCart}
-              size="lg"
-              className="w-full bg-gold-500 hover:bg-gold-600 text-coffee-900"
-            >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              Add {quantity} to Cart
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    </div>
   );
 };
