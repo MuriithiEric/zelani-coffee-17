@@ -18,7 +18,7 @@ const ThankYou = () => {
         
         <p className="text-xl text-coffee-700 mb-8 leading-relaxed">
           Your payment has been processed successfully. We're excited to get your 
-          Zelani Coffee on its way to you!
+          Zelani to you!
         </p>
         
         <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
