@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Package, MapPin, Calendar, AlertCircle, Truck } from "lucide-react";
+import { Search, Package, MapPin, Calendar, AlertCircle, Truck, Coffee, ShieldCheck, ShoppingBag } from "lucide-react";
 
 interface TrackingEvent {
   date: string;
@@ -16,19 +16,31 @@ interface TrackingEvent {
 }
 
 interface TrackingResult {
+  isLocalOrder: boolean;
   status: string;
   statusCode: string;
   origin: string;
   destination: string;
   estimatedDelivery: string | null;
   events: TrackingEvent[];
+  items?: Array<{
+    product_name: string;
+    quantity: number;
+    size?: string;
+    grind?: string;
+    unit_price: number;
+  }>;
+  totalAmount?: number;
+  currency?: string;
+  paymentStatus?: string;
 }
 
 const statusColorMap: Record<string, string> = {
+  completed: "bg-green-100 text-green-800 border-green-300",
   delivered: "bg-green-100 text-green-800 border-green-300",
   "in transit": "bg-blue-100 text-blue-800 border-blue-300",
   "out for delivery": "bg-amber-100 text-amber-800 border-amber-300",
-  transit: "bg-blue-100 text-blue-800 border-blue-300",
+  pending: "bg-amber-100 text-amber-850 border-amber-300",
   default: "bg-muted text-muted-foreground border-border",
 };
 
@@ -66,6 +78,7 @@ function parseTrackingData(data: any): TrackingResult | null {
       : "—";
 
     return {
+      isLocalOrder: false,
       status: shipment.status?.description || shipment.status?.status || "Unknown",
       statusCode: shipment.status?.statusCode || "",
       origin,
@@ -91,7 +104,7 @@ const TrackOrder = () => {
   const handleTrack = async () => {
     const trimmed = trackingNumber.trim();
     if (!trimmed) {
-      setError("Please enter a tracking number.");
+      setError("Please enter a tracking number or order reference.");
       return;
     }
 
@@ -100,77 +113,144 @@ const TrackOrder = () => {
     setResult(null);
 
     try {
+      // 1. Try querying the local orders table in Supabase first
+      const { data: orderData, error: dbError } = await supabase
+        .from("orders")
+        .select(`
+          *,
+          order_items (*)
+        `)
+        .eq("order_reference", trimmed)
+        .maybeSingle();
+
+      if (orderData) {
+        // Build mock shipping timeline events based on creation date
+        const createdDate = new Date(orderData.created_at);
+        const formatD = (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+        const formatT = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+        const events: TrackingEvent[] = [
+          {
+            date: formatD(createdDate),
+            time: formatT(createdDate),
+            description: "Order placed on Zelani Coffee store.",
+            location: "Nairobi Roastery, KE",
+          },
+        ];
+
+        if (orderData.payment_status === "completed") {
+          const paymentDate = new Date(createdDate.getTime() + 10 * 60 * 1000); // +10 mins
+          events.unshift({
+            date: formatD(paymentDate),
+            time: formatT(paymentDate),
+            description: "Payment confirmed. Preparing items for packaging.",
+            location: "Nairobi Roastery, KE",
+          });
+
+          // Mock roasting phase
+          const roastingDate = new Date(createdDate.getTime() + 2 * 60 * 60 * 1000); // +2 hrs
+          events.unshift({
+            date: formatD(roastingDate),
+            time: formatT(roastingDate),
+            description: "Premium coffee beans selected and packaged securely.",
+            location: "Nairobi Packaging Center, KE",
+          });
+        }
+
+        const deliveryEstimate = new Date(createdDate.getTime() + 3 * 24 * 60 * 60 * 1000); // +3 days
+
+        setResult({
+          isLocalOrder: true,
+          status: orderData.payment_status === "completed" ? "In Preparation" : "Awaiting Payment",
+          statusCode: orderData.payment_status,
+          origin: "Nairobi Roastery, KE",
+          destination: "Customer Address",
+          estimatedDelivery: deliveryEstimate.toLocaleDateString("en-US", {
+            weekday: "long", year: "numeric", month: "long", day: "numeric",
+          }),
+          events,
+          items: orderData.order_items || [],
+          totalAmount: orderData.total_amount,
+          currency: orderData.currency,
+          paymentStatus: orderData.payment_status,
+        });
+
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Fallback to DHL Edge Function live tracking API
       const { data, error: fnError } = await supabase.functions.invoke("dhl-track", {
         body: { trackingNumber: trimmed },
       });
 
       if (fnError) {
-        setError("Unable to fetch tracking info right now. Please try again in a moment.");
+        setError("Unable to locate order. Please check the reference ID and try again.");
         return;
       }
 
       if (data?.error || data?.detail || (!data?.shipments?.length)) {
-        setError("We couldn't find a shipment with that number. Please double-check and try again.");
+        setError("We couldn't find a shipment or order with that reference number. Please check and try again.");
         return;
       }
 
       const parsed = parseTrackingData(data);
       if (!parsed) {
-        setError("We couldn't find a shipment with that number. Please double-check and try again.");
+        setError("We couldn't parse the tracking details for that shipment number.");
         return;
       }
 
       setResult(parsed);
-    } catch {
-      setError("Unable to fetch tracking info right now. Please try again in a moment.");
+    } catch (err) {
+      setError("Unable to process tracking query. Please try again shortly.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#faf9f6] text-zinc-800">
       <Navigation />
 
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-28 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gold-100 rounded-full mb-4">
-              <Truck className="h-8 w-8 text-gold-700" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#fefaf0] border border-[#c89547]/30 rounded-full mb-4">
+              <Truck className="h-8 w-8 text-[#b37e38]" />
             </div>
-            <h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl font-bold text-coffee-900 mb-3">
-              Track Your Shipment
+            <h1 className="font-fredoka text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 mb-3">
+              Track Your Order
             </h1>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-lg mx-auto">
-              Enter your DHL waybill number to see live updates on your Zelani order
+            <p className="text-zinc-500 text-base max-w-lg mx-auto">
+              Enter your Zelani order reference (e.g. <span className="font-semibold text-zinc-700">zelani_order_...</span>) or DHL tracking number below
             </p>
           </div>
 
           {/* Search */}
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
             <Input
-              placeholder="Enter DHL tracking number"
+              placeholder="e.g. zelani_order_123456 or DHL waybill"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleTrack()}
-              className="flex-1 h-12 text-base"
+              className="flex-1 h-12 text-base rounded-full border-zinc-200 focus:border-zinc-400 pl-6 bg-white"
             />
             <Button
               onClick={handleTrack}
               disabled={isLoading}
               size="lg"
-              className="bg-gold-500 hover:bg-gold-600 text-coffee-900 h-12 px-8 whitespace-nowrap"
+              className="bg-[#c89547] hover:bg-[#b37e38] text-white h-12 rounded-full px-8 whitespace-nowrap"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 border-2 border-coffee-900/30 border-t-coffee-900 rounded-full animate-spin" />
-                  Tracking...
+                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Searching...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Search className="h-4 w-4" />
-                  Track Shipment
+                  Track Order
                 </span>
               )}
             </Button>
@@ -179,85 +259,117 @@ const TrackOrder = () => {
           {/* Loading skeleton */}
           {isLoading && (
             <div className="space-y-4">
-              <Skeleton className="h-32 w-full rounded-lg" />
-              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-32 w-full rounded-2xl" />
+              <Skeleton className="h-48 w-full rounded-2xl" />
             </div>
           )}
 
           {/* Error */}
           {error && !isLoading && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center">
-              <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-3" />
-              <p className="text-foreground font-medium">{error}</p>
+            <div className="bg-red-50 border border-red-100 rounded-2xl p-6 text-center">
+              <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+              <p className="text-zinc-800 font-medium">{error}</p>
             </div>
           )}
 
           {/* Results */}
           {result && !isLoading && (
-            <div className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-scale-in">
               {/* Status card */}
-              <div className="bg-card rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-2xl border border-zinc-150 shadow-sm p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Current Status</p>
-                    <Badge className={`text-sm px-4 py-1.5 ${getStatusColor(result.status)}`}>
+                    <p className="text-xs text-zinc-400 mb-1 uppercase font-bold tracking-wider">Status</p>
+                    <Badge className={`text-sm px-4 py-1.5 rounded-full border shadow-none font-semibold ${getStatusColor(result.status)}`}>
                       {result.status}
                     </Badge>
                   </div>
                   {result.estimatedDelivery && (
                     <div className="text-left sm:text-right">
-                      <p className="text-sm text-muted-foreground mb-1">Estimated Delivery</p>
-                      <p className="text-foreground font-semibold flex items-center gap-1.5">
-                        <Calendar className="h-4 w-4 text-gold-600" />
+                      <p className="text-xs text-zinc-400 mb-1 uppercase font-bold tracking-wider">Est. Delivery</p>
+                      <p className="text-zinc-800 font-bold flex items-center sm:justify-end gap-1.5">
+                        <Calendar className="h-4 w-4 text-[#b37e38]" />
                         {result.estimatedDelivery}
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-muted/50 rounded-md p-4">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">Origin</p>
-                    <p className="text-foreground font-medium flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-coffee-500 shrink-0" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-zinc-100">
+                  <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-150">
+                    <p className="text-[10px] text-zinc-400 mb-1 uppercase font-bold tracking-wider">Origin</p>
+                    <p className="text-zinc-800 text-sm font-semibold flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 text-zinc-500 shrink-0" />
                       {result.origin}
                     </p>
                   </div>
-                  <div className="bg-muted/50 rounded-md p-4">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">Destination</p>
-                    <p className="text-foreground font-medium flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-gold-600 shrink-0" />
+                  <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-150">
+                    <p className="text-[10px] text-zinc-400 mb-1 uppercase font-bold tracking-wider">Destination</p>
+                    <p className="text-zinc-800 text-sm font-semibold flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 text-[#b37e38] shrink-0" />
                       {result.destination}
                     </p>
                   </div>
                 </div>
               </div>
 
+              {/* Items Card (If Local Order) */}
+              {result.isLocalOrder && result.items && result.items.length > 0 && (
+                <div className="bg-white rounded-2xl border border-zinc-150 shadow-sm p-6">
+                  <h3 className="font-fredoka text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5 text-[#b37e38]" />
+                    <span>Order Items</span>
+                  </h3>
+                  <div className="space-y-4">
+                    {result.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-sm">
+                        <div className="space-y-0.5">
+                          <p className="font-bold text-zinc-800">{item.product_name}</p>
+                          <p className="text-xs text-zinc-500">
+                            Size: {item.size || "Standard"} • Grind: {item.grind || "Whole Bean"}
+                          </p>
+                        </div>
+                        <span className="font-semibold text-zinc-650 text-right">
+                          {item.quantity} x {result.currency} {item.unit_price}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="pt-4 border-t border-zinc-100 flex justify-between items-center">
+                      <span className="font-bold text-zinc-900">Total Charged</span>
+                      <span className="font-bold text-[#c89547] text-lg">
+                        {result.currency} {result.totalAmount?.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Timeline */}
               {result.events.length > 0 && (
-                <div className="bg-card rounded-lg shadow-md p-6">
-                  <h2 className="font-playfair text-xl font-bold text-coffee-900 mb-6">
-                    Shipment Timeline
+                <div className="bg-white rounded-2xl border border-zinc-150 shadow-sm p-6">
+                  <h2 className="font-fredoka text-lg font-bold text-zinc-900 mb-6 flex items-center gap-2">
+                    <Coffee className="h-5 w-5 text-[#b37e38]" />
+                    <span>Shipment Timeline</span>
                   </h2>
                   <div className="relative">
-                    <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border" />
+                    <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-zinc-100" />
                     <div className="space-y-6">
                       {result.events.map((event, i) => (
                         <div key={i} className="relative flex gap-4">
                           <div
                             className={`relative z-10 mt-1 h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
                               i === 0
-                                ? "bg-gold-500 border-gold-600"
-                                : "bg-card border-border"
+                                ? "bg-[#c89547] border-[#b37e38]"
+                                : "bg-white border-zinc-200"
                             }`}
                           >
-                            <Package className={`h-3 w-3 ${i === 0 ? "text-coffee-900" : "text-muted-foreground"}`} />
+                            <Package className={`h-3 w-3 ${i === 0 ? "text-white" : "text-zinc-400"}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`font-medium ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>
+                            <p className={`font-semibold text-sm ${i === 0 ? "text-zinc-900" : "text-zinc-500"}`}>
                               {event.description}
                             </p>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-zinc-400 font-medium">
                               <span>{event.date} • {event.time}</span>
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />

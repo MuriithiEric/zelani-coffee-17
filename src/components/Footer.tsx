@@ -9,14 +9,14 @@ export const Footer = () => {
           
           {/* Brand Info (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2.5">
               <img
-                src="/lovable-uploads/zelani-star-logo.png"
-                alt="Zelani Logo"
-                className="h-10 w-10 object-contain"
+                src="/lovable-uploads/zelani-logo.jpeg"
+                alt="Zelani Coffee Logo"
+                className="h-10 w-10 object-contain rounded-full"
               />
-              <span className="font-playfair italic font-extrabold text-2xl text-zinc-900 tracking-wide">
-                Zelani
+              <span className="font-fredoka font-bold text-2xl text-zinc-900 tracking-wide">
+                Zelani Coffee
               </span>
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed max-w-sm">

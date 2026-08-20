@@ -59,9 +59,9 @@ const Register = () => {
             {/* Logo */}
             <div className="flex justify-center mb-4">
             <img
-              src="/lovable-uploads/zelani-star-logo.png"
-              alt="Zelani Logo"
-              className="h-12 w-12 object-contain"
+              src="/lovable-uploads/zelani-logo.jpeg"
+              alt="Zelani Coffee Logo"
+              className="h-12 w-12 object-contain rounded-full"
             />
             </div>
             

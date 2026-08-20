@@ -11,7 +11,10 @@ import TrackOrder from "./pages/TrackOrder";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Register from "./pages/Register";
+import Checkout from "./pages/Checkout";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -21,13 +24,16 @@ const App = () => (
       <CartProvider>
         <TooltipProvider>
           <Toaster />
-          <Sonner />
+          <Toaster as={Sonner} />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/products" element={<Products />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/track" element={<TrackOrder />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

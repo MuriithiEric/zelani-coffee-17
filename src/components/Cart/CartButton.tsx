@@ -4,9 +4,10 @@ import { useCart } from "@/hooks/useCart";
 
 interface CartButtonProps {
   onClick: () => void;
+  className?: string;
 }
 
-export const CartButton = ({ onClick }: CartButtonProps) => {
+export const CartButton = ({ onClick, className }: CartButtonProps) => {
   const { getItemCount } = useCart();
   const itemCount = getItemCount();
 
@@ -15,7 +16,7 @@ export const CartButton = ({ onClick }: CartButtonProps) => {
       variant="ghost"
       size="sm"
       onClick={onClick}
-      className="relative text-foreground hover:text-coffee-600"
+      className={`relative hover:opacity-80 transition-opacity ${className || "text-foreground"}`}
     >
       <ShoppingCart className="h-6 w-6" />
       {itemCount > 0 && (

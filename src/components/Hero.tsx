@@ -1,75 +1,54 @@
-import { Star } from "lucide-react";
+import { Coffee, Scan } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
-  const scrollToMenu = () => {
-    const menuSection = document.getElementById("menu");
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
-    <section id="home" className="relative min-h-screen pt-24 pb-16 flex items-center justify-center overflow-hidden">
-      {/* Background Image with Blurred Gradient Overlay */}
+    <section id="home" className="relative min-h-screen pt-24 pb-16 flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
+      {/* Background Image with Dark Vignette Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&q=80&w=1600"
-          alt="Premium Coffee Beans Background"
-          className="w-full h-full object-cover"
+          src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&q=80&w=1600"
+          alt="Premium Dark Coffee Beans Background"
+          className="w-full h-full object-cover opacity-45 select-none"
         />
-        <div className="absolute inset-0 bg-[#faf9f6]/95 lg:bg-gradient-to-r lg:from-[#faf9f6]/98 lg:via-[#faf9f6]/90 lg:to-[#faf9f6]/60 backdrop-blur-[6px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-zinc-950/90"></div>
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/85"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-
-          {/* Left Column: Heading and Actions */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6 lg:pr-8">
-            <div className="flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-4 py-1.5 rounded-full border border-zinc-200/50 shadow-sm">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              <span className="text-xs font-semibold tracking-wider text-zinc-700 uppercase">
-                Best Coffee in Town
-              </span>
-            </div>
-
-            <h1 className="font-fredoka text-5xl sm:text-6xl md:text-7xl font-bold text-zinc-900 leading-[1.08] tracking-tight relative">
-              Zelani <br />
-              <span className="text-zinc-800">Delicious</span> <br />
-              <span className="relative inline-block">
-                Coffee
-                <span className="absolute -right-12 top-2 md:top-4 bg-amber-100 border border-amber-300/40 text-amber-800 rounded-full w-10 h-10 flex items-center justify-center text-xs font-bold font-playfair italic shadow-sm">
-                  100%
-                </span>
-              </span>
-            </h1>
-
-            <p className="text-zinc-700 font-inter text-base sm:text-lg max-w-lg leading-relaxed font-medium">
-              A slice of heaven. Buy Zelani Coffee from the convenience of your own home and office.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2">
-              <Button
-                onClick={scrollToMenu}
-                size="lg"
-                className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-full px-8 py-6 text-sm font-semibold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                ORDER NOW
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-transparent border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 text-zinc-700 rounded-full px-8 py-6 text-sm font-semibold tracking-wider transition-all duration-200"
-              >
-                BOOK A TABLE
-              </Button>
-            </div>
-          </div>
-
-
-
-
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center justify-center text-center">
+        {/* Subtitle with Coffee Icon */}
+        <div className="flex items-center gap-2 text-[#dfc5a3] text-xs sm:text-sm uppercase tracking-widest font-medium mb-4 select-none">
+          <Coffee className="h-4.5 w-4.5 text-[#dfc5a3]" />
+          <span>Crafted with love, served with passion</span>
         </div>
+
+        {/* Main Heading */}
+        <h1 className="font-fredoka text-4xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.12] max-w-4xl drop-shadow-sm">
+          Discover the Journey of <br className="hidden sm:inline" /> your Coffee
+        </h1>
+
+        {/* Subtext Description */}
+        <p className="text-zinc-400 font-inter text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed mt-5 mb-8 font-light">
+          Explore roasters, trace origins, and build your coffee passport with Bean trace.
+        </p>
+
+        {/* Search Bar Container */}
+        <div className="w-full max-w-2xl bg-[#2a221b]/40 backdrop-blur-md border border-amber-900/20 rounded-full p-1.5 flex items-center shadow-2xl focus-within:border-amber-700/40 transition-all duration-300">
+          <input
+            type="text"
+            placeholder="Search for roasters or coffees..."
+            className="w-full bg-transparent pl-5 pr-3 py-3 text-white placeholder-zinc-500 focus:outline-none text-sm sm:text-base"
+          />
+          <Button className="bg-[#dfc5a3] hover:bg-[#d0b38e] text-zinc-950 rounded-full px-8 py-3.5 h-auto font-semibold text-sm sm:text-base tracking-wide transition-all duration-200 shrink-0 shadow-md">
+            Search
+          </Button>
+        </div>
+
+        {/* Scan Button */}
+        <button className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#dfc5a3]/30 hover:border-[#dfc5a3]/60 bg-[#2a221b]/10 hover:bg-[#2a221b]/30 text-[#dfc5a3] text-xs sm:text-sm font-medium tracking-widest transition-all duration-300 mt-8 uppercase shadow-inner">
+          <Scan className="h-4.5 w-4.5" />
+          <span>Scan Coffee Code</span>
+        </button>
       </div>
     </section>
   );
