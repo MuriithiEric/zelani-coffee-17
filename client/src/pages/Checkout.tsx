@@ -56,8 +56,34 @@ export default function Checkout() {
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("KE");
 
-  // Sign In / Registration Discount
+  // Real User Authentication State
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(api.isAuthenticated());
+  const [currentUser, setCurrentUser] = useState<any>(api.getSessionUser());
+
+  useEffect(() => {
+    const syncAuth = () => {
+      const isAuth = api.isAuthenticated();
+      const user = api.getSessionUser();
+      setIsUserLoggedIn(isAuth);
+      setCurrentUser(user);
+
+      if (user) {
+        if (!email && user.email) {
+          setEmail(user.email);
+        }
+        if (!fullName) {
+          const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
+          if (name) {
+            setFullName(name);
+          }
+        }
+      }
+    };
+
+    syncAuth();
+    window.addEventListener("zelani-auth-change", syncAuth);
+    return () => window.removeEventListener("zelani-auth-change", syncAuth);
+  }, []);
 
   // Payment Selection: 'card' | 'paypal' | 'mpesa'
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "mpesa">("card");
@@ -195,36 +221,44 @@ export default function Checkout() {
             {/* Left side: Checkout Form and Payment */}
             <form onSubmit={handleCheckoutSubmit} className="lg:col-span-7 space-y-6">
               
-              {/* Promo Sign-in Banner */}
+              {/* Promo Sign-in / Member Discount Banner */}
               <div className={`border rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center transition-all ${
                 isUserLoggedIn 
-                  ? "bg-amber-50/50 border-amber-200/60" 
+                  ? "bg-amber-50/70 border-amber-200" 
                   : "bg-[#2a221b]/5 border-zinc-200"
               }`}>
                 <div className="bg-[#dfc5a3]/20 p-3 rounded-full shrink-0">
                   <Sparkles className="h-6 w-6 text-[#b37e38]" />
                 </div>
                 <div className="flex-1 space-y-1">
-                  <p className="font-semibold text-zinc-900 text-base">
-                    {isUserLoggedIn ? "10% Discount Applied! 🎉" : "Sign in / Register for 10% Off!"}
+                  <p className="font-semibold text-zinc-900 text-base flex items-center gap-2">
+                    {isUserLoggedIn ? (
+                      <>
+                        10% Member Discount Applied! <Check className="h-4 w-4 text-green-600 inline shrink-0" />
+                      </>
+                    ) : (
+                      "Sign In or Register for 10% Off!"
+                    )}
                   </p>
-                  <p className="text-zinc-650 text-sm">
-                    {isUserLoggedIn 
-                      ? "Thank you for being a registered member of Zelani Coffee. Your membership discount has been applied." 
-                      : "Create or log into your account to claim a 10% discount on all checkout items."}
+                  <p className="text-zinc-600 text-sm">
+                    {isUserLoggedIn ? (
+                      <>
+                        Welcome back{currentUser?.firstName ? `, ${currentUser.firstName}` : ""}. Your 10% membership discount has been automatically applied to this order.
+                      </>
+                    ) : (
+                      "Create an account or sign in to claim an instant 10% discount on all items in your order."
+                    )}
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => setIsUserLoggedIn(!isUserLoggedIn)}
-                  className={`rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-wider shrink-0 transition-all ${
-                    isUserLoggedIn 
-                      ? "bg-zinc-200 text-zinc-700 hover:bg-zinc-300"
-                      : "bg-[#dfc5a3] hover:bg-[#d0b38e] text-zinc-950"
-                  }`}
-                >
-                  {isUserLoggedIn ? "Switch to Guest" : "Simulate Sign-in"}
-                </Button>
+                {!isUserLoggedIn && (
+                  <Button
+                    type="button"
+                    onClick={() => navigate("/register?redirect=/checkout")}
+                    className="rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-wider shrink-0 transition-all bg-[#dfc5a3] hover:bg-[#d0b38e] text-zinc-950 shadow-sm flex items-center gap-1.5"
+                  >
+                    Sign In / Register
+                  </Button>
+                )}
               </div>
 
               {/* Shipping Details */}

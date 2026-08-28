@@ -1,20 +1,31 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
-import { UserPlus, LogIn, ArrowRight } from "lucide-react";
+import { UserPlus, LogIn, ArrowRight, Sparkles } from "lucide-react";
 import { api } from "@/lib/api/api-client";
 
 const Register = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get("redirect") || "/";
+  const mode = searchParams.get("mode");
+
+  const [isLogin, setIsLogin] = useState(mode === "login");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: ""
   });
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (mode === "login") {
+      setIsLogin(true);
+    }
+  }, [mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +38,7 @@ const Register = () => {
         }
         await api.auth.login(formData.email, formData.password);
         toast.success("Login successful!");
-        navigate("/");
+        navigate(redirect);
       } else {
         if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
           toast.error("Please fill in all fields");
@@ -38,8 +49,8 @@ const Register = () => {
           return;
         }
         await api.auth.register(formData.email, formData.password, formData.name);
-        toast.success("Account created successfully!");
-        setIsLogin(true);
+        toast.success("Account created successfully! Welcome to Zelani Coffee.");
+        navigate(redirect);
       }
     } catch (err: any) {
       toast.error(err.message || "Authentication failed");
@@ -61,6 +72,13 @@ const Register = () => {
 
         <div className="max-w-md w-full bg-white border border-zinc-100 rounded-[2.5rem] p-8 sm:p-10 shadow-xl relative z-10 transition-all duration-300">
           
+          {redirect === "/checkout" && (
+            <div className="mb-6 p-3.5 bg-amber-50 border border-amber-200/70 rounded-2xl flex items-center gap-2.5 text-xs text-amber-900 font-medium">
+              <Sparkles className="h-4 w-4 text-[#b37e38] shrink-0" />
+              <span>Complete sign-in or registration to get <strong>10% off</strong> your checkout order!</span>
+            </div>
+          )}
+
           {/* Header */}
           <div className="text-center space-y-3 mb-8">
             {/* Logo */}
@@ -76,9 +94,10 @@ const Register = () => {
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
             <p className="text-zinc-500 text-sm font-inter">
-              {isLogin ? "Log in to your Zelani account" : "Join Zelani Coffee for exclusive updates"}
+              {isLogin ? "Log in to your Zelani account" : "Join Zelani Coffee for exclusive member benefits & 10% discount"}
             </p>
           </div>
+
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
