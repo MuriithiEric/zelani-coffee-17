@@ -1,0 +1,2009 @@
+openapi: 3.0.3
+info:
+  title: Zelani Coffee API
+  version: 1.0.0
+  description: Comprehensive REST API documentation for Zelani Coffee e-commerce platform
+    covering authentication, user management, products catalog, cart operations, orders,
+    payment processing, shipping tracking, and file uploads.
+paths:
+  /api/:
+    get:
+      operationId: root_retrieve
+      description: Returns API service name and seeds initial default products and
+        admin user if database is empty.
+      summary: API Root Welcome
+      tags:
+      - General
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+  /api/auth/login:
+    post:
+      operationId: auth_login_create
+      description: Authenticates user credentials and returns JWT access and refresh
+        tokens.
+      summary: User Login
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/auth/logout:
+    post:
+      operationId: auth_logout_create
+      description: Logs out the user on client side.
+      summary: User Logout
+      tags:
+      - Auth
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          description: ''
+  /api/auth/refresh:
+    post:
+      operationId: auth_refresh_create
+      description: Generates a new pair of JWT access and refresh tokens for the authenticated
+        user.
+      summary: Refresh JWT Tokens
+      tags:
+      - Auth
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/auth/register:
+    post:
+      operationId: auth_register_create
+      description: Registers a new customer account and returns JWT access and refresh
+        tokens.
+      summary: Register Customer
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/cart:
+    get:
+      operationId: cart_list
+      description: Returns all items currently in the authenticated user shopping
+        cart.
+      summary: Get User Cart
+      tags:
+      - Cart
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartItemDetail'
+          description: ''
+    post:
+      operationId: cart_create
+      description: Adds a product to the cart or updates quantity for the specific
+        grind and size options.
+      summary: Add or Update Cart Item
+      tags:
+      - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemCreated'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    delete:
+      operationId: cart_destroy
+      description: Removes all items from the authenticated user shopping cart.
+      summary: Clear Cart
+      tags:
+      - Cart
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          description: ''
+  /api/cart/item:
+    delete:
+      operationId: cart_item_destroy
+      description: Removes a specific product item (matching productId, grind, and
+        size) from the cart.
+      summary: Remove Cart Item
+      parameters:
+      - in: query
+        name: grind
+        schema:
+          type: string
+        description: Grind variation
+      - in: query
+        name: productId
+        schema:
+          type: string
+        description: Product identifier to remove
+        required: true
+      - in: query
+        name: size
+        schema:
+          type: string
+        description: Package size variation
+      tags:
+      - Cart
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/files/{id}:
+    get:
+      operationId: files_retrieve
+      description: Streams binary content of a private file if the requesting user
+        owns it or has Admin role.
+      summary: Download Private File
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: File record UUID
+        required: true
+      tags:
+      - Files
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    delete:
+      operationId: files_destroy
+      description: Deletes a file from storage and removes its metadata record if
+        the user owns it or has Admin role.
+      summary: Delete File
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: File record UUID
+        required: true
+      tags:
+      - Files
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/files/public/{id}:
+    get:
+      operationId: files_public_retrieve
+      description: Streams binary content of a public file without requiring authentication.
+      summary: Download Public File
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: File record UUID
+        required: true
+      tags:
+      - Files
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/files/upload:
+    post:
+      operationId: files_upload_create
+      description: Uploads an image, document, or PDF (up to 10MB) to secure local
+        storage.
+      summary: Upload File (Multipart)
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          default: general
+        description: Storage subdirectory category
+      - in: query
+        name: isPublic
+        schema:
+          type: boolean
+          default: false
+        description: Whether file is publicly accessible without auth
+      tags:
+      - Files
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUploadRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileUploadRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRecord'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/health:
+    get:
+      operationId: health_retrieve
+      description: Verifies database connectivity and storage directory write permissions.
+      summary: System Health Check
+      tags:
+      - General
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+          description: ''
+  /api/orders:
+    get:
+      operationId: orders_list
+      description: Retrieves all placed orders with items ordered by creation date
+        descending. Requires Admin or Roaster role.
+      summary: List All Orders (Admin / Roaster Only)
+      tags:
+      - Orders
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    post:
+      operationId: orders_create
+      description: Creates a customer order along with line items.
+      summary: Place New Order
+      tags:
+      - Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/orders/{id}/status:
+    patch:
+      operationId: orders_status_partial_update
+      description: Updates the payment/fulfillment status of an existing order. Requires
+        Admin or Roaster role.
+      summary: Update Order Status (Admin / Roaster Only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: Order UUID
+        required: true
+      tags:
+      - Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStatusUpdateRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStatusUpdateRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStatusUpdateRequestRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/orders/my-orders:
+    get:
+      operationId: orders_my_orders_list
+      description: Retrieves all orders placed by the currently authenticated user
+        matching their email.
+      summary: List Customer Orders
+      tags:
+      - Orders
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+          description: ''
+  /api/orders/reference/{ref}:
+    get:
+      operationId: orders_reference_retrieve
+      description: Fetches order details and items using the unique order reference
+        code.
+      summary: Get Order by Reference
+      parameters:
+      - in: path
+        name: ref
+        schema:
+          type: string
+        description: Order reference code (e.g. ORD-1724839201-ABCD)
+        required: true
+      tags:
+      - Orders
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/payments:
+    get:
+      operationId: payments_list
+      description: Retrieves all transaction logs and associated order metadata. Requires
+        Admin role.
+      summary: List Payment Logs (Admin Only)
+      tags:
+      - Payments
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentRecord'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    post:
+      operationId: payments_create
+      description: Stores a new payment transaction log record for an order.
+      summary: Record Payment Log
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRecord'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/payments/initiate:
+    post:
+      operationId: payments_initiate_create
+      description: Initiates payment transaction (Card, M-Pesa, PayPal) and marks
+        order payment status as completed.
+      summary: Initiate Order Payment
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiatePaymentResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/products:
+    get:
+      operationId: products_list
+      description: Returns the full catalog of coffee products.
+      summary: List All Products
+      tags:
+      - Products
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          description: ''
+    post:
+      operationId: products_create
+      description: Creates a new coffee product in the catalog. Requires Admin role.
+      summary: Create Product (Admin Only)
+      tags:
+      - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/products/{id}:
+    put:
+      operationId: products_update
+      description: Updates product details. Requires Admin role.
+      summary: Update Product (Admin Only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+        description: Product slug / identifier
+        required: true
+      tags:
+      - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    delete:
+      operationId: products_destroy
+      description: Deletes a product from the catalog. Requires Admin role.
+      summary: Delete Product (Admin Only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+        description: Product slug / identifier
+        required: true
+      tags:
+      - Products
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/shipping/track:
+    post:
+      operationId: shipping_track_create
+      description: Queries the DHL Express tracking API for real-time shipment status.
+      summary: Track DHL Shipment
+      tags:
+      - Shipping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingTrackRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShippingTrackRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShippingTrackRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/users:
+    get:
+      operationId: users_list
+      description: Returns a list of all registered user accounts. Requires Admin
+        privileges.
+      summary: List Users (Admin Only)
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDetail'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/users/{id}:
+    patch:
+      operationId: users_partial_update
+      description: Updates fields (role, active status, name, password) of a specific
+        user. Requires Admin role.
+      summary: Update User Profile (Admin Only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: User UUID
+        required: true
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+    delete:
+      operationId: users_destroy
+      description: Deletes a specific user account. Requires Admin role.
+      summary: Delete User Account (Admin Only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: string
+          format: uuid
+        description: User UUID
+        required: true
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSummary'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+  /api/users/me:
+    get:
+      operationId: users_me_retrieve
+      description: Returns profile information of the currently authenticated user.
+      summary: Get Current User Profile
+      tags:
+      - Users
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+          description: ''
+components:
+  schemas:
+    AddToCartRequestRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          minLength: 1
+          description: Product identifier to add
+        quantity:
+          type: integer
+          default: 1
+          description: Quantity to add (defaults to 1)
+        grind:
+          type: string
+          default: ''
+          description: Chosen grind option
+        size:
+          type: string
+          default: ''
+          description: Chosen package size
+      required:
+      - productId
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT Access token (15-minute validity)
+        refreshToken:
+          type: string
+          description: JWT Refresh token (7-day validity)
+        user:
+          allOf:
+          - $ref: '#/components/schemas/UserSummary'
+          description: Authenticated user basic profile
+      required:
+      - accessToken
+      - refreshToken
+      - user
+    CartItemCreated:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Cart item UUID
+        userId:
+          type: string
+          description: Owner user UUID
+        productId:
+          type: string
+          description: Product ID
+        quantity:
+          type: integer
+          description: Selected quantity
+        grind:
+          type: string
+          description: Selected grind
+        size:
+          type: string
+          description: Selected size
+        product:
+          allOf:
+          - $ref: '#/components/schemas/CartProductMini'
+          description: Product preview
+      required:
+      - grind
+      - id
+      - product
+      - productId
+      - quantity
+      - size
+      - userId
+    CartItemDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Cart item UUID
+        userId:
+          type: string
+          description: Owner user UUID
+        productId:
+          type: string
+          description: Product ID
+        quantity:
+          type: integer
+          description: Selected quantity
+        grind:
+          type: string
+          description: Selected grind
+        size:
+          type: string
+          description: Selected size
+        createdAt:
+          type: string
+          description: Added timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Updated timestamp (ISO 8601)
+        product:
+          allOf:
+          - $ref: '#/components/schemas/Product'
+          description: Full product details
+      required:
+      - createdAt
+      - grind
+      - id
+      - product
+      - productId
+      - quantity
+      - size
+      - updatedAt
+      - userId
+    CartProductMini:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Product ID
+        name:
+          type: string
+          description: Product name
+        price:
+          type: number
+          format: double
+          description: Unit price
+        image:
+          type: string
+          description: Image path
+      required:
+      - id
+      - image
+      - name
+      - price
+    DatabaseEnum:
+      enum:
+      - connected
+      - disconnected
+      type: string
+      description: |-
+        * `connected` - connected
+        * `disconnected` - disconnected
+    FileRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          description: File record UUID
+        originalName:
+          type: string
+          description: Original uploaded filename
+        storageName:
+          type: string
+          description: Unique stored filename
+        storagePath:
+          type: string
+          description: Relative storage path
+        mimeType:
+          type: string
+          description: Detected MIME type
+        size:
+          type: integer
+          description: File size in bytes
+        category:
+          type: string
+          description: File storage category folder
+        uploadedById:
+          type: string
+          nullable: true
+          description: UUID of uploading user
+        isPublic:
+          type: boolean
+          description: Publicly downloadable without auth
+        createdAt:
+          type: string
+          description: Upload timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Last update timestamp (ISO 8601)
+      required:
+      - category
+      - createdAt
+      - id
+      - isPublic
+      - mimeType
+      - originalName
+      - size
+      - storageName
+      - storagePath
+      - updatedAt
+      - uploadedById
+    FileUploadRequestRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: Multipart binary file payload (Max 10MB; images, PDFs, docs)
+      required:
+      - file
+    HealthCheckResponse:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          description: |-
+            Overall system health status
+
+            * `ok` - ok
+            * `error` - error
+        database:
+          allOf:
+          - $ref: '#/components/schemas/DatabaseEnum'
+          description: |-
+            PostgreSQL database connectivity status
+
+            * `connected` - connected
+            * `disconnected` - disconnected
+        storage:
+          allOf:
+          - $ref: '#/components/schemas/StorageEnum'
+          description: |-
+            Local file storage availability status
+
+            * `available` - available
+            * `unavailable` - unavailable
+      required:
+      - database
+      - status
+      - storage
+    InitiatePaymentRequestRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          minLength: 1
+          description: Target order UUID
+        paymentMethod:
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodEnum'
+          description: |-
+            Selected payment method channel
+
+            * `card` - card
+            * `mpesa` - mpesa
+            * `paypal` - paypal
+            * `Card Checkout` - Card Checkout
+            * `M-Pesa Checkout` - M-Pesa Checkout
+            * `PayPal Checkout` - PayPal Checkout
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Payment charge amount
+      required:
+      - amount
+      - orderId
+      - paymentMethod
+    InitiatePaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Payment initiation success
+        status:
+          type: string
+          default: completed
+          description: Transaction status
+        transactionId:
+          type: string
+          description: Generated transaction identifier
+        payment:
+          allOf:
+          - $ref: '#/components/schemas/PaymentRecord'
+          description: Created payment record
+      required:
+      - payment
+      - transactionId
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Informational message or error description
+      required:
+      - message
+    OrderCreateRequestRequest:
+      type: object
+      properties:
+        orderReference:
+          type: string
+          minLength: 1
+          description: Unique order reference (e.g. 'ORD-1724839201-ABCD')
+        totalAmount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Total order amount
+        currency:
+          type: string
+          minLength: 1
+          default: KES
+          description: Currency code (KES, USD, etc.)
+        paymentStatus:
+          type: string
+          minLength: 1
+          default: pending
+          description: Initial payment status ('pending', 'completed')
+        intasendTrackingId:
+          type: string
+          nullable: true
+          description: Payment gateway tracking ID
+        customerEmail:
+          nullable: true
+          description: Customer contact email
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        customerPhone:
+          type: string
+          nullable: true
+          description: Customer contact phone number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemCreateRequest'
+          description: List of ordered items
+      required:
+      - orderReference
+      - totalAmount
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Order item UUID
+        orderId:
+          type: string
+          description: Parent order UUID
+        productId:
+          type: string
+          description: Product ID
+        productName:
+          type: string
+          description: Product name snapshot
+        quantity:
+          type: integer
+          description: Quantity ordered
+        unitPrice:
+          type: string
+          description: Unit price snapshot
+        grind:
+          type: string
+          nullable: true
+          description: Grind option
+        size:
+          type: string
+          nullable: true
+          description: Size option
+        createdAt:
+          type: string
+          description: Timestamp (ISO 8601)
+      required:
+      - createdAt
+      - id
+      - orderId
+      - productId
+      - productName
+      - quantity
+      - unitPrice
+    OrderItemCreateRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          minLength: 1
+          description: Product identifier
+        productName:
+          type: string
+          minLength: 1
+          description: Product display name
+        quantity:
+          type: integer
+          minimum: 1
+          description: Item quantity
+        unitPrice:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Unit price
+        grind:
+          type: string
+          nullable: true
+          description: Grind option
+        size:
+          type: string
+          nullable: true
+          description: Size option
+      required:
+      - productId
+      - productName
+      - quantity
+      - unitPrice
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Order UUID
+        orderReference:
+          type: string
+          description: Unique human-readable order reference
+        totalAmount:
+          type: string
+          description: Total order amount
+        currency:
+          type: string
+          description: Currency code
+        paymentStatus:
+          type: string
+          description: Payment status ('pending', 'completed', 'failed', 'refunded')
+        intasendTrackingId:
+          type: string
+          nullable: true
+          description: Gateway tracking reference
+        customerEmail:
+          type: string
+          nullable: true
+          description: Customer email
+        customerPhone:
+          type: string
+          nullable: true
+          description: Customer phone
+        createdAt:
+          type: string
+          description: Order timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Last update timestamp (ISO 8601)
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          description: List of items in this order
+      required:
+      - createdAt
+      - currency
+      - id
+      - orderItems
+      - orderReference
+      - paymentStatus
+      - totalAmount
+      - updatedAt
+    OrderSummaryInPayment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Order UUID
+        orderReference:
+          type: string
+          description: Order reference
+        totalAmount:
+          type: string
+          description: Total amount
+        currency:
+          type: string
+          description: Currency
+        paymentStatus:
+          type: string
+          description: Payment status
+        intasendTrackingId:
+          type: string
+          nullable: true
+          description: Tracking ID
+        customerEmail:
+          type: string
+          nullable: true
+          description: Customer email
+        customerPhone:
+          type: string
+          nullable: true
+          description: Customer phone
+        createdAt:
+          type: string
+          description: Order creation timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Order update timestamp (ISO 8601)
+      required:
+      - createdAt
+      - currency
+      - id
+      - orderReference
+      - paymentStatus
+      - totalAmount
+      - updatedAt
+    PatchedOrderStatusUpdateRequestRequest:
+      type: object
+      properties:
+        payment_status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          description: |-
+            Updated order payment/fulfillment status
+
+            * `pending` - pending
+            * `completed` - completed
+            * `failed` - failed
+            * `cancelled` - cancelled
+            * `processing` - processing
+            * `shipped` - shipped
+    PatchedUserUpdateRequest:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            Updated role
+
+            * `Admin` - Admin
+            * `Customer` - Customer
+            * `Roaster` - Roaster
+        is_active:
+          type: boolean
+          description: Updated active status
+        firstName:
+          type: string
+          description: Updated first name
+        lastName:
+          type: string
+          description: Updated last name
+        passwordHash:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: New password to hash and update
+    PaymentCreateRequestRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          minLength: 1
+          description: Target order UUID
+        paymentMethod:
+          type: string
+          minLength: 1
+          description: Payment gateway or method name
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Paid amount
+        currency:
+          type: string
+          minLength: 1
+          default: KES
+          description: Currency
+        status:
+          type: string
+          minLength: 1
+          default: pending
+          description: Payment status
+        transactionId:
+          type: string
+          nullable: true
+          description: External gateway transaction ID
+      required:
+      - amount
+      - orderId
+      - paymentMethod
+    PaymentMethodEnum:
+      enum:
+      - card
+      - mpesa
+      - paypal
+      - Card Checkout
+      - M-Pesa Checkout
+      - PayPal Checkout
+      type: string
+      description: |-
+        * `card` - card
+        * `mpesa` - mpesa
+        * `paypal` - paypal
+        * `Card Checkout` - Card Checkout
+        * `M-Pesa Checkout` - M-Pesa Checkout
+        * `PayPal Checkout` - PayPal Checkout
+    PaymentRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Payment UUID
+        orderId:
+          type: string
+          description: Associated order UUID
+        paymentMethod:
+          type: string
+          description: Payment method (e.g. 'Card Checkout', 'M-Pesa Checkout')
+        amount:
+          type: string
+          description: Payment amount
+        currency:
+          type: string
+          description: Currency code
+        status:
+          type: string
+          description: Payment status ('pending', 'completed', 'failed')
+        transactionId:
+          type: string
+          nullable: true
+          description: Transaction reference ID
+        createdAt:
+          type: string
+          description: Payment timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Payment update timestamp (ISO 8601)
+        order:
+          allOf:
+          - $ref: '#/components/schemas/OrderSummaryInPayment'
+          description: Associated order details (included in admin logs)
+      required:
+      - amount
+      - createdAt
+      - currency
+      - id
+      - orderId
+      - paymentMethod
+      - status
+      - updatedAt
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - completed
+      - failed
+      - cancelled
+      - processing
+      - shipped
+      type: string
+      description: |-
+        * `pending` - pending
+        * `completed` - completed
+        * `failed` - failed
+        * `cancelled` - cancelled
+        * `processing` - processing
+        * `shipped` - shipped
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique product slug/identifier
+        name:
+          type: string
+          description: Product display name
+        description:
+          type: string
+          description: Short product description
+        price:
+          type: number
+          format: double
+          description: Product price
+        image:
+          type: string
+          description: Product image URL or path
+        grind:
+          type: string
+          description: Grind option (e.g., Whole Beans, Medium Ground)
+        size:
+          type: string
+          description: Package size (e.g., 250g, 500g, 1kg)
+        tastingNotes:
+          type: array
+          items:
+            type: string
+          description: Flavor tasting notes
+        details:
+          type: string
+          description: Detailed product description and background
+        isKes:
+          type: boolean
+          default: true
+          description: True if currency is Kenyan Shillings (KES)
+        createdAt:
+          type: string
+          description: Creation timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Last update timestamp (ISO 8601)
+      required:
+      - description
+      - details
+      - grind
+      - id
+      - image
+      - name
+      - price
+      - size
+      - tastingNotes
+    ProductCreateRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: Unique product slug/identifier (e.g. 'premium-dark-roast-1kg')
+        name:
+          type: string
+          minLength: 1
+          description: Product name
+        description:
+          type: string
+          minLength: 1
+          description: Short description
+        price:
+          type: number
+          format: double
+          description: Price in selected currency
+        image:
+          type: string
+          minLength: 1
+          description: Image URL or relative path
+        grind:
+          type: string
+          minLength: 1
+          description: Grind type (e.g. Whole Beans, Medium Ground)
+        size:
+          type: string
+          minLength: 1
+          description: Package size (e.g. 250g, 500g, 1kg)
+        tastingNotes:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of tasting notes
+        details:
+          type: string
+          minLength: 1
+          description: Detailed story & tasting notes
+        isKes:
+          type: boolean
+          default: true
+          description: Is price in KES?
+      required:
+      - description
+      - details
+      - grind
+      - id
+      - image
+      - name
+      - price
+      - size
+    ProductUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Product name
+        description:
+          type: string
+          minLength: 1
+          description: Short description
+        price:
+          type: number
+          format: double
+          description: Price in selected currency
+        image:
+          type: string
+          minLength: 1
+          description: Image URL or path
+        grind:
+          type: string
+          minLength: 1
+          description: Grind type
+        size:
+          type: string
+          minLength: 1
+          description: Package size
+        tastingNotes:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of tasting notes
+        details:
+          type: string
+          minLength: 1
+          description: Detailed story
+        isKes:
+          type: boolean
+          description: Is price in KES?
+    RoleEnum:
+      enum:
+      - Admin
+      - Customer
+      - Roaster
+      type: string
+      description: |-
+        * `Admin` - Admin
+        * `Customer` - Customer
+        * `Roaster` - Roaster
+    ShippingTrackRequestRequest:
+      type: object
+      properties:
+        trackingNumber:
+          type: string
+          minLength: 1
+          description: DHL shipment tracking number (e.g. '1234567890')
+      required:
+      - trackingNumber
+    StatusEnum:
+      enum:
+      - ok
+      - error
+      type: string
+      description: |-
+        * `ok` - ok
+        * `error` - error
+    StorageEnum:
+      enum:
+      - available
+      - unavailable
+      type: string
+      description: |-
+        * `available` - available
+        * `unavailable` - unavailable
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Operation success status
+        message:
+          type: string
+          description: Optional description
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User UUID
+        email:
+          type: string
+          format: email
+          description: Email address
+        firstName:
+          type: string
+          nullable: true
+          description: First name
+        lastName:
+          type: string
+          nullable: true
+          description: Last name
+        role:
+          type: string
+          description: User role ('Admin', 'Customer', 'Roaster')
+        isActive:
+          type: boolean
+          description: Whether the user account is active
+        createdAt:
+          type: string
+          description: Account creation timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Account last update timestamp (ISO 8601)
+      required:
+      - createdAt
+      - email
+      - id
+      - isActive
+      - role
+      - updatedAt
+    UserLoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          description: Registered email address
+        passwordHash:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: Password for authentication
+      required:
+      - email
+      - passwordHash
+    UserRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          description: Unique email address for registration
+        passwordHash:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: Raw password string from client
+        firstName:
+          type: string
+          nullable: true
+          description: User's first name
+        lastName:
+          type: string
+          nullable: true
+          description: User's last name
+      required:
+      - email
+      - passwordHash
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User UUID
+        email:
+          type: string
+          format: email
+          description: User email address
+        firstName:
+          type: string
+          nullable: true
+          description: First name
+        lastName:
+          type: string
+          nullable: true
+          description: Last name
+        role:
+          type: string
+          description: User role ('Admin', 'Customer', 'Roaster')
+      required:
+      - email
+      - id
+      - role
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer token. Enter your access token without "Bearer ".
+tags:
+- name: General
+  description: Health check and root service info
+- name: Auth
+  description: Authentication, registration, JWT token refresh and logout
+- name: Users
+  description: User profile management and admin user administration
+- name: Products
+  description: Coffee catalog, blends, roasts and pricing
+- name: Cart
+  description: Shopping cart management and cart item removal
+- name: Orders
+  description: Order placement, order history, reference lookup, and status updates
+- name: Payments
+  description: Payment initiation (M-Pesa, Card, PayPal) and transaction logs
+- name: Shipping
+  description: DHL shipping tracking and logistics integration
+- name: Files
+  description: Secure multipart file uploads and streaming downloads
