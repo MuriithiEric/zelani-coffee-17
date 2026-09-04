@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import Index from "./pages/Index";
+import OurStory from "./pages/OurStory";
+import Impact from "./pages/Impact";
 import ThankYou from "./pages/ThankYou";
 import TrackOrder from "./pages/TrackOrder";
 import Orders from "./pages/Orders";
@@ -32,6 +34,9 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/products" element={<Products />} />
               <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/our-story" element={<OurStory />} />
+              <Route path="/about" element={<Navigate to="/our-story" replace />} />
+              <Route path="/impact" element={<Impact />} />
               <Route path="/register" element={<Register />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/admin" element={<Admin />} />

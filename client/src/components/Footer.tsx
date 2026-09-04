@@ -1,5 +1,5 @@
-
-import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -20,50 +20,91 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed max-w-sm">
-              We made it our mission to create community everyday and grow custom, lasting relationships with our staff, 
-              our suppliers and of course you, our customers.
+              Born from generosity. Built on relationships. Rooted in Kenya. Inspired by Africa. Created for the world.
             </p>
+            <div className="pt-2 text-xs text-zinc-400">
+              From Farm · To Cup · To Future
+            </div>
           </div>
 
-          {/* Store Locations (4 cols) */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Quick Links (3 cols) */}
+          <div className="lg:col-span-3 space-y-4">
             <h3 className="font-fredoka text-lg font-bold text-zinc-900">
-              Store Locations
+              Explore Zelani
             </h3>
-            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
-              Find your nearest Zelani Coffee store with opening hours, location and contact details.
-            </p>
-            <button className="flex items-center space-x-1 text-sm font-bold text-zinc-900 hover:text-zinc-700 transition-colors">
-              <span>FIND LOCATION</span>
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link to="/our-story" className="text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5">
+                  <ArrowRight className="w-3.5 h-3.5 text-[#dfc5a3]" />
+                  <span>Our Story</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/impact" className="text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5">
+                  <ArrowRight className="w-3.5 h-3.5 text-[#dfc5a3]" />
+                  <span>Impact 2030</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/products" className="text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5">
+                  <ArrowRight className="w-3.5 h-3.5 text-[#dfc5a3]" />
+                  <span>Our Products</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/track" className="text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5">
+                  <ArrowRight className="w-3.5 h-3.5 text-[#dfc5a3]" />
+                  <span>Track Your Order</span>
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* Contact & Socials (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Store Locations & Community (2 cols) */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="font-fredoka text-lg font-bold text-zinc-900">
+              Find Us
+            </h3>
+            <div className="space-y-3 text-sm text-zinc-600">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div className="text-xs leading-relaxed">
+                  <strong>Marula Green Market</strong><br />
+                  Marula Lane, Karen<br />
+                  Nairobi, Kenya
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                Kirinyaga County & Mt. Kenya smallholder origin partners.
+              </p>
+            </div>
+          </div>
+
+          {/* Contact & Socials (3 cols) */}
+          <div className="lg:col-span-3 space-y-6">
             <div className="space-y-4">
               <h3 className="font-fredoka text-lg font-bold text-zinc-900">
-                Contact Zelani Coffee!
+                Connect With Us
               </h3>
               <div className="space-y-2">
                 <a
-                  href="mailto:alowishus@gmail.com"
+                  href="mailto:contact@zelanicoffee.com"
                   className="flex items-center space-x-3 text-zinc-500 hover:text-zinc-900 text-sm transition-colors"
                 >
                   <div className="bg-zinc-50 p-2 rounded-full border border-zinc-100">
                     <Mail className="h-4 w-4 text-zinc-800" />
                   </div>
-                  <span>alowishus@gmail.com</span>
+                  <span>contact@zelanicoffee.com</span>
                 </a>
                 
                 <a
-                  href="tel:+110234254243"
+                  href="tel:+254700000000"
                   className="flex items-center space-x-3 text-zinc-500 hover:text-zinc-900 text-sm transition-colors"
                 >
                   <div className="bg-zinc-50 p-2 rounded-full border border-zinc-100">
                     <Phone className="h-4 w-4 text-zinc-800" />
                   </div>
-                  <span>+110 234 254 243</span>
+                  <span>+254 700 000 000</span>
                 </a>
               </div>
             </div>
@@ -85,33 +126,13 @@ export const Footer = () => {
                 </a>
               ))}
             </div>
-
-            {/* Newsletter 10% Off Subscription Form */}
-            <div className="space-y-3 pt-2">
-              <h4 className="font-fredoka text-sm font-bold text-zinc-900">
-                Get 10% Off!
-              </h4>
-              <p className="text-xs text-zinc-500">
-                Subscribe to our newsletter for 10% off on all products and exclusive roastery updates.
-              </p>
-              <div className="flex max-w-xs bg-zinc-50 rounded-full border border-zinc-200 p-1">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="bg-transparent border-0 outline-0 px-3 py-2 text-xs flex-grow text-zinc-800 placeholder-zinc-400"
-                />
-                <button className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-colors">
-                  SUBSCRIBE
-                </button>
-              </div>
-            </div>
           </div>
 
         </div>
 
         {/* Bottom copyright and legal */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 text-zinc-400 text-xs">
-          <p>© Copyright 2026 Zelani Coffee</p>
+          <p>© Copyright 2026 Zelani Coffee · All Rights Reserved</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <a href="#" className="hover:text-zinc-600 transition-colors">Terms of Use</a>
             <span>|</span>
