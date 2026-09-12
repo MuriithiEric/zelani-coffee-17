@@ -67,30 +67,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_api.wsgi.application'
 
-# Database Connection (Parsing the PostgreSQL URL)
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    url = urlparse(DATABASE_URL)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:],
-            'USER': url.username,
-            'PASSWORD': url.password,
-            'HOST': url.hostname,
-            'PORT': url.port or 5432,
-            'OPTIONS': {
-                'options': '-c search_path=public'
-            }
-        }
+# Database Configuration (SQLite default, PostgreSQL secondary)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
+
+# DATABASE_URL = os.getenv('DATABASE_URL')
+# if DATABASE_URL:
+#     url = urlparse(DATABASE_URL)
+#     postgres_db = {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': url.path[1:],
+#         'USER': url.username,
+#         'PASSWORD': url.password,
+#         'HOST': url.hostname,
+#         'PORT': url.port or 5432,
+#         'OPTIONS': {
+#             'options': '-c search_path=public'
+#         }
+#     }
+#     DATABASES['postgres'] = postgres_db
+#     DATABASES['secondary'] = postgres_db
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = []
@@ -142,8 +142,30 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-# CORS configuration
+# CORS configuration (hardcoded without relying on environment variables)
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000,http://localhost:5173,http://localhost:8081')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in FRONTEND_URL.split(',') if origin.strip()]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8081',
+    'http://127.0.0.1:8081',
+    'https://zelanicoffee.com',
+    'http://zelanicoffee.com',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8081',
+    'http://127.0.0.1:8081',
+]
 

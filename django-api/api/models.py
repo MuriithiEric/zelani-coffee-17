@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 
 class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -17,6 +16,14 @@ class User(models.Model):
     def is_authenticated(self):
         return True
 
+    @property
+    def is_superuser(self):
+        return (self.role or '').lower() == 'admin'
+
+    @property
+    def is_staff(self):
+        return (self.role or '').lower() in ['admin', 'roaster']
+
     class Meta:
         db_table = 'users'
 
@@ -28,7 +35,7 @@ class Product(models.Model):
     image = models.CharField(max_length=255)
     grind = models.CharField(max_length=255)
     size = models.CharField(max_length=255)
-    tasting_notes = ArrayField(models.CharField(max_length=255), db_column='tasting_notes')
+    tasting_notes = models.JSONField(default=list, db_column='tasting_notes')
     details = models.TextField()
     is_kes = models.BooleanField(default=True, db_column='is_kes')
     created_at = models.DateTimeField(auto_now_add=True, db_column='created_at')

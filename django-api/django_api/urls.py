@@ -21,8 +21,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from api import views as api_views
 
 urlpatterns = [
+    # Root / Startup System Status
+    path('', api_views.health, name='root-status'),
+    path('health', api_views.health, name='root-health'),
+
     path('admin/', admin.site.urls),
     
     # OpenAPI & Swagger root aliases

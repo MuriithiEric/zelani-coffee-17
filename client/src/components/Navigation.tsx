@@ -6,7 +6,8 @@ import {
   UserPlus, 
   ShoppingBag, 
   LogOut, 
-  ChevronDown
+  ChevronDown,
+  LayoutDashboard
 } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ export const Navigation = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(api.isAuthenticated());
+  const [currentUser, setCurrentUser] = useState(api.getSessionUser());
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +51,7 @@ export const Navigation = () => {
   useEffect(() => {
     const handleAuthChange = () => {
       setIsAuthenticated(api.isAuthenticated());
+      setCurrentUser(api.getSessionUser());
     };
     window.addEventListener("zelani-auth-change", handleAuthChange);
     return () => {
@@ -277,6 +280,19 @@ export const Navigation = () => {
               {/* Register / Orders & Sign Out Links */}
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
+                  {(currentUser?.role || "").toLowerCase() === "admin" && (
+                    <Link
+                      to="/admin"
+                      className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border ${
+                        showSolidNav
+                          ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
+                          : "bg-[#dfc5a3]/20 hover:bg-[#dfc5a3]/30 border-[#dfc5a3]/40 text-[#dfc5a3]"
+                      }`}
+                    >
+                      <LayoutDashboard className="h-3.5 w-3.5" />
+                      <span>Dashboard</span>
+                    </Link>
+                  )}
                   <Link
                     to="/orders"
                     className={`flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border ${
@@ -453,6 +469,16 @@ export const Navigation = () => {
 
                 {isAuthenticated ? (
                   <div className="flex flex-col space-y-2">
+                    {(currentUser?.role || "").toLowerCase() === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-center space-x-2 bg-amber-50 hover:bg-amber-100 text-amber-900 py-2.5 rounded-full text-xs font-semibold transition-colors border border-amber-200"
+                      >
+                        <LayoutDashboard className="h-3.5 w-3.5" />
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    )}
                     <Link
                       to="/orders"
                       onClick={() => setIsOpen(false)}

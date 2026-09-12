@@ -39,7 +39,7 @@ class UserRegistrationSerializer(serializers.Serializer):
     lastName = serializers.CharField(required=False, allow_null=True, allow_blank=True, help_text="User's last name")
 
 class UserLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True, help_text="Registered email address")
+    email = serializers.CharField(required=True, help_text="Registered email address or username")
     passwordHash = serializers.CharField(required=True, write_only=True, help_text="Password for authentication")
 
 # -------------------------------------------------------------------------

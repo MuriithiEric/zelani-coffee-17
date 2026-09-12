@@ -146,10 +146,10 @@ export default function Admin() {
 
   useEffect(() => {
     const currentUser = api.getSessionUser();
-    if (!currentUser || currentUser.role !== 'Admin') {
+    if (!currentUser || (currentUser.role || '').toLowerCase() !== 'admin') {
       setIsAdmin(false);
       toast.error("Access denied. Admin access only.");
-      navigate("/register");
+      navigate("/register?mode=login&redirect=/admin");
     } else {
       setIsAdmin(true);
       loadOrders();

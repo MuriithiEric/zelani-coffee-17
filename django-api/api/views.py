@@ -8,6 +8,9 @@ import urllib.parse
 import json
 from mimetypes import guess_type
 from django.db import connection, transaction
+from django.db.models import Q
+from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.hashers import check_password
 from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes, authentication_classes, parser_classes
@@ -271,12 +274,17 @@ def welcome(request):
 @extend_schema(
     tags=['General'],
     summary='System Health Check',
-    description='Verifies database connectivity and storage directory write permissions.',
+    description='Verifies database connectivity, storage directory permissions, and seeds initial data if needed.',
     responses={200: HealthCheckResponseSerializer}
 )
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health(request):
+    try:
+        seed_data_if_needed()
+    except Exception:
+        pass
+
     db_status = 'disconnected'
     try:
         with connection.cursor() as cursor:
@@ -353,29 +361,111 @@ def register(request):
     }
 )
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def login(request):
     data = request.data
-    email = data.get('email')
-    password = data.get('passwordHash')
+    identifier = (data.get('email') or '').strip()
+    password = data.get('passwordHash') or ''
 
-    if not email or not password:
-        return Response({'message': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+    if not identifier or not password:
+        return Response({'message': 'Email/username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # 1. Check against Django superusers / staff users in auth_user
+    django_user = DjangoUser.objects.filter(
+        Q(username__iexact=identifier) | Q(email__iexact=identifier)
+    ).first()
+
+    if django_user and django_user.check_password(password):
+        if not django_user.is_active:
+            return Response({'message': 'Account is inactive'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        is_admin_user = django_user.is_superuser or django_user.is_staff
+
+        # Find or create corresponding api.models.User
+        user_email = django_user.email.strip() if django_user.email else ''
+        api_user = None
+        if user_email:
+            api_user = User.objects.filter(email__iexact=user_email).first()
+        if not api_user:
+            api_user = User.objects.filter(email__iexact=identifier).first()
+        if not api_user and '@' not in identifier:
+            fallback_email = f"{django_user.username}@zelanicoffee.com"
+            api_user = User.objects.filter(email__iexact=fallback_email).first()
+
+        if api_user:
+            if is_admin_user:
+                api_user.role = 'Admin'
+            api_user.is_active = True
+            try:
+                api_user.password_hash = ph.hash(password)
+            except Exception:
+                pass
+            if django_user.first_name and not api_user.first_name:
+                api_user.first_name = django_user.first_name
+            if django_user.last_name and not api_user.last_name:
+                api_user.last_name = django_user.last_name
+            api_user.save()
+        else:
+            final_email = user_email or (identifier if '@' in identifier else f"{django_user.username}@zelanicoffee.com")
+            api_user = User.objects.create(
+                email=final_email,
+                password_hash=ph.hash(password),
+                first_name=django_user.first_name or django_user.username,
+                last_name=django_user.last_name or ('Admin' if is_admin_user else ''),
+                role='Admin' if is_admin_user else 'Customer',
+                is_active=True
+            )
+
+        return Response(generate_tokens(api_user))
+
+    # 2. Check against api.models.User
+    api_user = User.objects.filter(email__iexact=identifier).first()
+    if not api_user:
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not api_user.is_active:
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Check password via Argon2 or fallback to Django hasher
+    password_valid = False
     try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
+        ph.verify(api_user.password_hash, password)
+        password_valid = True
+    except Exception:
+        try:
+            if check_password(password, api_user.password_hash):
+                password_valid = True
+                api_user.password_hash = ph.hash(password)
+                api_user.save(update_fields=['password_hash'])
+        except Exception:
+            pass
+
+    if not password_valid:
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    if not user.is_active:
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    # If this user is an Admin, ensure synced to Django auth_user
+    if api_user.role == 'Admin':
+        username_candidate = api_user.email.split('@')[0]
+        dj_user = DjangoUser.objects.filter(
+            Q(username__iexact=username_candidate) | Q(email__iexact=api_user.email)
+        ).first()
+        if dj_user:
+            if not dj_user.is_superuser or not dj_user.is_staff:
+                dj_user.is_superuser = True
+                dj_user.is_staff = True
+            dj_user.set_password(password)
+            dj_user.save()
+        else:
+            DjangoUser.objects.create_superuser(
+                username=username_candidate,
+                email=api_user.email,
+                password=password,
+                first_name=api_user.first_name or '',
+                last_name=api_user.last_name or ''
+            )
 
-    try:
-        ph.verify(user.password_hash, password)
-    except argon2.exceptions.VerifyMismatchError:
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    return Response(generate_tokens(user))
+    return Response(generate_tokens(api_user))
 
 @extend_schema(
     tags=['Auth'],

@@ -36,9 +36,14 @@ const Register = () => {
           toast.error("Please fill in all fields");
           return;
         }
-        await api.auth.login(formData.email, formData.password);
+        const res = await api.auth.login(formData.email, formData.password);
         toast.success("Login successful!");
-        navigate(redirect);
+        const role = (res?.user?.role || "").toLowerCase();
+        if (role === "admin" && (!redirect || redirect === "/")) {
+          navigate("/admin");
+        } else {
+          navigate(redirect);
+        }
       } else {
         if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
           toast.error("Please fill in all fields");
@@ -119,14 +124,14 @@ const Register = () => {
 
             <div className="space-y-1.5 text-left">
               <label htmlFor="email" className="text-xs font-bold text-zinc-600 uppercase tracking-wider pl-1">
-                Email Address
+                {isLogin ? "Email Address or Username" : "Email Address"}
               </label>
               <input
-                type="email"
+                type={isLogin ? "text" : "email"}
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="john@example.com"
+                placeholder={isLogin ? "zelani or name@example.com" : "john@example.com"}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-full px-5 py-3.5 text-sm text-zinc-800 outline-0 focus:bg-white focus:border-zinc-450 transition-all"
               />
             </div>
