@@ -123,9 +123,9 @@ const ThankYou = () => {
         </div>
 
         <p className="mt-12 text-xs text-zinc-400">
-          Questions about your order? Contact us at{" "}
-          <a href="mailto:info@zelanicoffee.com" className="text-[#b37e38] hover:underline font-semibold">
-            info@zelanicoffee.com
+          Questions about your order? Reach out via WhatsApp or call{" "}
+          <a href="tel:+254777405410" className="text-[#b37e38] hover:underline font-semibold">
+            +254 777 405 410
           </a>
         </p>
       </div>

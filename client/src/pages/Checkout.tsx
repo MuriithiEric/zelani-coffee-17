@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { api } from "@/lib/api/api-client";
 import { toast } from "sonner";
-import { CreditCard, ShieldCheck, Tag, Info, AlertCircle, Sparkles, Smartphone, Check } from "lucide-react";
+import { ShieldCheck, Tag, Info, Sparkles, MessageCircle, Check } from "lucide-react";
 
 const KES_TO_USD = 0.0077;
 const EAST_AFRICA = ["UG", "TZ", "RW", "ET"];
@@ -85,19 +85,9 @@ export default function Checkout() {
     return () => window.removeEventListener("zelani-auth-change", syncAuth);
   }, []);
 
-  // Payment Selection: 'card' | 'paypal' | 'mpesa'
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "mpesa">("card");
-
-  // Card payment details
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
-
-  // M-Pesa phone number
-  const [mpesaPhone, setMpesaPhone] = useState("");
-
+  // Payment Selection: 'paypal' | 'whatsapp'
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "whatsapp">("paypal");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mpesaStatus, setMpesaStatus] = useState<"idle" | "sending" | "waiting" | "success">("idle");
 
   // Pricing calculations
   const productTotalKES = getCartTotal();
@@ -130,41 +120,7 @@ export default function Checkout() {
       return;
     }
 
-    if (paymentMethod === "card") {
-      if (cardNumber.length < 16 || !cardExpiry || cardCvv.length < 3) {
-        toast.error("Please fill in valid card details");
-        return;
-      }
-    }
-
-    if (paymentMethod === "mpesa") {
-      if (!mpesaPhone) {
-        toast.error("Please enter a valid M-Pesa phone number");
-        return;
-      }
-    }
-
     setIsProcessing(true);
-
-    if (paymentMethod === "mpesa") {
-      setMpesaStatus("sending");
-      toast.info("Sending M-Pesa STK Push prompt to your phone...");
-      
-      // Simulate STK Push prompt
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      setMpesaStatus("waiting");
-      toast.info("Waiting for customer to enter M-Pesa PIN on their phone...");
-
-      // Simulate PIN input and confirmation
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-      setMpesaStatus("success");
-      toast.success("M-Pesa payment received successfully!");
-    } else {
-      // Simulate Card or PayPal processing
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      toast.success("Payment completed successfully!");
-    }
-
     const orderRef = `zelani_order_${Date.now()}`;
 
     // Insert order to database
@@ -188,7 +144,7 @@ export default function Checkout() {
         items: orderItems,
       });
 
-      // Also create payment record via simulated gateway initiation
+      // Initiate payment record in database
       await api.payments.initiate({
         orderId: (createdOrder as any).id,
         paymentMethod: paymentMethod,
@@ -197,9 +153,54 @@ export default function Checkout() {
         phoneNumber: phone || undefined,
       });
 
-      setIsProcessing(false);
       clearCart();
-      navigate(`/thank-you?ref=${orderRef}`);
+
+      if (paymentMethod === "paypal") {
+        toast.info("Order placed! Redirecting to PayPal to pay muraypatrick@gmail.com...");
+        const paypalAmount = displayCurrency === "USD"
+          ? orderTotal.toFixed(2)
+          : (orderTotal * KES_TO_USD).toFixed(2);
+        const returnUrl = `${window.location.origin}/thank-you?ref=${orderRef}`;
+        const cancelUrl = window.location.href;
+        const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=muraypatrick@gmail.com&item_name=${encodeURIComponent(`Zelani Coffee Order ${orderRef}`)}&amount=${paypalAmount}&currency_code=USD&return=${encodeURIComponent(returnUrl)}&cancel_return=${encodeURIComponent(cancelUrl)}`;
+
+        setTimeout(() => {
+          window.location.href = paypalUrl;
+        }, 1000);
+      } else {
+        // WhatsApp order
+        toast.success("Order placed! Opening WhatsApp to complete your order...");
+        const countryName = COUNTRIES.find((c) => c.code === country)?.name || country;
+        const itemsList = items
+          .map((i) => `• ${i.quantity}x ${i.product.name} (${i.product.size || "Standard"}, ${i.product.grind || "Whole Bean"}) - ${formatPrice(i.product.price * i.quantity)}`)
+          .join("\n");
+
+        const msgLines = [
+          `*New Zelani Coffee Order* ☕`,
+          `*Order Reference:* ${orderRef}`,
+          ``,
+          `*Customer Details:*`,
+          `• Name: ${fullName}`,
+          `• Phone: ${phone}`,
+          `• Email: ${email}`,
+          `• Delivery Address: ${streetAddress}, ${city}, ${postalCode}, ${countryName}`,
+          ``,
+          `*Order Items:*`,
+          itemsList,
+          ``,
+          `*Total Amount:* ${formatPrice(orderTotal)}`,
+          ``,
+          `Please confirm my order and send payment instructions. Thank you!`
+        ];
+
+        const waText = encodeURIComponent(msgLines.join("\n"));
+        const waUrl = `https://wa.me/254777405410?text=${waText}`;
+
+        setTimeout(() => {
+          window.open(waUrl, "_blank");
+          navigate(`/thank-you?ref=${orderRef}`);
+        }, 800);
+      }
     } catch (err: any) {
       console.error("Error saving order & payment: ", err);
       toast.error(err.message || "Failed to save order or process payment.");
@@ -375,149 +376,83 @@ export default function Checkout() {
                     Payment Method
                   </h3>
                   <p className="text-zinc-500 text-xs mt-1">
-                    Select your preferred secure payment option
+                    Select your preferred payment option
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("card")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-1.5 ${
-                      paymentMethod === "card"
-                        ? "border-[#c89547] bg-[#fefaf0] text-[#b37e38]"
-                        : "border-zinc-200 hover:bg-zinc-50 text-zinc-600"
-                    }`}
-                  >
-                    <CreditCard className="h-6 w-6" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Card</span>
-                  </button>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("paypal")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-1.5 ${
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all gap-2 ${
                       paymentMethod === "paypal"
-                        ? "border-[#c89547] bg-[#fefaf0] text-[#b37e38]"
+                        ? "border-[#c89547] bg-[#fefaf0] text-[#b37e38] shadow-sm"
                         : "border-zinc-200 hover:bg-zinc-50 text-zinc-600"
                     }`}
                   >
-                    <span className="font-playfair italic font-extrabold text-lg leading-none">PayPal</span>
-                    <span className="text-xs font-bold uppercase tracking-wider">PayPal</span>
+                    <span className="font-playfair italic font-extrabold text-2xl leading-none text-[#003087]">
+                      PayPal
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      Order by PayPal
+                    </span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("mpesa")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-1.5 ${
-                      paymentMethod === "mpesa"
-                        ? "border-[#c89547] bg-[#fefaf0] text-[#b37e38]"
+                    onClick={() => setPaymentMethod("whatsapp")}
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all gap-2 ${
+                      paymentMethod === "whatsapp"
+                        ? "border-[#25D366] bg-[#f0fdf4] text-green-700 shadow-sm"
                         : "border-zinc-200 hover:bg-zinc-50 text-zinc-600"
                     }`}
                   >
-                    <Smartphone className="h-6 w-6" />
-                    <span className="text-xs font-bold uppercase tracking-wider">M-Pesa</span>
+                    <MessageCircle className="h-7 w-7 text-[#25D366]" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      Order via WhatsApp
+                    </span>
                   </button>
                 </div>
 
-                {/* Card Fields */}
-                {paymentMethod === "card" && (
-                  <div className="space-y-4 p-4 bg-zinc-50 rounded-xl border border-zinc-150 animate-scale-in">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">
-                        Card Number
-                      </label>
-                      <Input
-                        placeholder="4111 2222 3333 4444"
-                        value={cardNumber}
-                        maxLength={16}
-                        onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ""))}
-                        className="bg-white rounded-full"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">
-                          Expiry Date
-                        </label>
-                        <Input
-                          placeholder="MM/YY"
-                          value={cardExpiry}
-                          maxLength={5}
-                          onChange={(e) => setCardExpiry(e.target.value)}
-                          className="bg-white rounded-full"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">
-                          CVV / CVC
-                        </label>
-                        <Input
-                          placeholder="123"
-                          type="password"
-                          value={cardCvv}
-                          maxLength={4}
-                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
-                          className="bg-white rounded-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* PayPal Instructions */}
                 {paymentMethod === "paypal" && (
-                  <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-150 space-y-2 animate-scale-in">
-                    <div className="flex items-start gap-2.5">
+                  <div className="p-5 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-3 animate-scale-in text-left">
+                    <div className="flex items-start gap-3">
                       <Info className="h-5 w-5 text-[#b37e38] shrink-0 mt-0.5" />
-                      <p className="text-sm text-zinc-650">
-                        After clicking "Place Order", you will be redirected to PayPal's secure portal to complete checkout. Once done, you'll be redirected back to Zelani Coffee.
-                      </p>
+                      <div className="space-y-1.5">
+                        <p className="text-sm font-semibold text-zinc-900">
+                          PayPal Direct Payment to <span className="font-mono text-[#b37e38] font-bold">muraypatrick@gmail.com</span>
+                        </p>
+                        <p className="text-xs text-zinc-600 leading-relaxed">
+                          When you click <strong>Place Order & Pay with PayPal</strong>, you will be redirected to PayPal's secure portal to pay directly to <span className="font-mono font-semibold text-zinc-800">muraypatrick@gmail.com</span>. Once payment completes, you'll be redirected back to Zelani Coffee.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-zinc-600 gap-1">
+                      <span>Total to pay via PayPal:</span>
+                      <span className="font-bold text-zinc-900 text-sm">
+                        USD {displayCurrency === "USD" ? orderTotal.toFixed(2) : (orderTotal * KES_TO_USD).toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 )}
 
-                {/* M-Pesa Phone Field */}
-                {paymentMethod === "mpesa" && (
-                  <div className="space-y-4 p-4 bg-zinc-50 rounded-xl border border-zinc-150 animate-scale-in">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">
-                        M-Pesa Mobile Number
-                      </label>
-                      <Input
-                        required={paymentMethod === "mpesa"}
-                        placeholder="e.g. 254712345678"
-                        value={mpesaPhone}
-                        onChange={(e) => setMpesaPhone(e.target.value.replace(/\D/g, ""))}
-                        className="bg-white rounded-full"
-                      />
-                      <p className="text-xs text-zinc-500 pl-1">
-                        Use international format without the "+" symbol (e.g. 254700000000).
-                      </p>
-                    </div>
-
-                    {mpesaStatus !== "idle" && (
-                      <div className="border border-[#c89547]/30 bg-amber-50/40 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                          {mpesaStatus === "success" ? (
-                            <div className="bg-green-150 p-1.5 rounded-full">
-                              <Check className="h-4 w-4 text-green-600" />
-                            </div>
-                          ) : (
-                            <span className="h-5 w-5 border-2 border-[#b37e38]/30 border-t-[#b37e38] rounded-full animate-spin" />
-                          )}
-                          <p className="text-sm font-semibold text-zinc-800">
-                            {mpesaStatus === "sending" && "Initializing STK Push prompt..."}
-                            {mpesaStatus === "waiting" && "Waiting for M-Pesa PIN input..."}
-                            {mpesaStatus === "success" && "M-Pesa confirmation received!"}
-                          </p>
-                        </div>
-                        <p className="text-xs text-zinc-650">
-                          {mpesaStatus === "sending" && "We are requesting a payment checkout prompt for your mobile number."}
-                          {mpesaStatus === "waiting" && "Please check your phone screen for the prompt asking you to enter your M-Pesa PIN to authorize this transaction."}
+                {/* WhatsApp Instructions */}
+                {paymentMethod === "whatsapp" && (
+                  <div className="p-5 bg-green-50/60 rounded-2xl border border-green-200/80 space-y-3 animate-scale-in text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-green-100 p-1.5 rounded-full text-green-700 shrink-0 mt-0.5">
+                        <MessageCircle className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="text-sm font-semibold text-zinc-900">
+                          Direct WhatsApp Order with <span className="font-mono text-green-700 font-bold">+254 777 405 410</span>
+                        </p>
+                        <p className="text-xs text-zinc-600 leading-relaxed">
+                          Clicking <strong>Place Order via WhatsApp</strong> will open WhatsApp directly with our team on <strong className="font-mono text-zinc-800">+254 777 405 410</strong>. Your order reference, items, and delivery address will be pre-filled automatically for immediate dispatch and payment confirmation.
                         </p>
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -594,17 +529,30 @@ export default function Checkout() {
                   onClick={handleCheckoutSubmit}
                   disabled={isProcessing}
                   size="lg"
-                  className="w-full bg-[#c89547] hover:bg-[#b37e38] text-white rounded-full py-6 font-semibold shadow-md transition-all flex items-center justify-center gap-2"
+                  className={`w-full text-white rounded-full py-6 font-semibold shadow-md transition-all flex items-center justify-center gap-2 ${
+                    paymentMethod === "whatsapp"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-[#c89547] hover:bg-[#b37e38]"
+                  }`}
                 >
                   {isProcessing ? (
                     <>
                       <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing Checkout...
+                      {paymentMethod === "paypal" ? "Connecting to PayPal..." : "Preparing WhatsApp Order..."}
                     </>
                   ) : (
                     <>
-                      <ShieldCheck className="h-5 w-5" />
-                      Place Order & Pay
+                      {paymentMethod === "whatsapp" ? (
+                        <>
+                          <MessageCircle className="h-5 w-5" />
+                          Place Order via WhatsApp
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="h-5 w-5" />
+                          Place Order & Pay with PayPal
+                        </>
+                      )}
                     </>
                   )}
                 </Button>

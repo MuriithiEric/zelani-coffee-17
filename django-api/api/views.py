@@ -1230,11 +1230,15 @@ def initiate_payment(request):
 
     transaction_id = f"trans_{int(datetime.datetime.now().timestamp() * 1000)}"
     method_raw = data.get('paymentMethod')
-    payment_method_label = 'Card Checkout'
-    if method_raw == 'mpesa':
-        payment_method_label = 'M-Pesa Checkout'
-    elif method_raw == 'paypal':
+    payment_method_label = 'Direct Checkout'
+    if method_raw == 'paypal':
         payment_method_label = 'PayPal Checkout'
+    elif method_raw == 'whatsapp':
+        payment_method_label = 'WhatsApp Order'
+    elif method_raw == 'mpesa':
+        payment_method_label = 'M-Pesa Checkout'
+    elif method_raw == 'card':
+        payment_method_label = 'Card Checkout'
 
     p = Payment.objects.create(
         order=order,

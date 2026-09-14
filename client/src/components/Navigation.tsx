@@ -266,7 +266,7 @@ export const Navigation = () => {
 
               {/* Phone Action Button */}
               <a
-                href="tel:+1234567890"
+                href="tel:+254777405410"
                 className={`hidden xl:flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm ${
                   showSolidNav 
                     ? "bg-zinc-900 hover:bg-zinc-800 text-white" 
@@ -274,7 +274,7 @@ export const Navigation = () => {
                 }`}
               >
                 <Phone className="h-3.5 w-3.5" />
-                <span>+1 234 567 890</span>
+                <span>+254 777 405 410</span>
               </a>
 
               {/* Register / Orders & Sign Out Links */}
@@ -460,11 +460,11 @@ export const Navigation = () => {
               {/* Mobile Auth & Contact */}
               <div className="pt-3 border-t border-zinc-100 space-y-2">
                 <a
-                  href="tel:+1234567890"
+                  href="tel:+254777405410"
                   className="flex items-center justify-center space-x-2 bg-zinc-900 hover:bg-zinc-800 text-white py-2.5 rounded-full text-xs font-semibold shadow-sm"
                 >
                   <Phone className="h-3.5 w-3.5" />
-                  <span>+1 234 567 890</span>
+                  <span>+254 777 405 410</span>
                 </a>
 
                 {isAuthenticated ? (

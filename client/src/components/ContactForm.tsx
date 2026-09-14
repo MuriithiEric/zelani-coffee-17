@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MapPin, Phone, Mail } from "lucide-react";
+import { Send, MapPin, Phone, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const ContactForm = () => {
@@ -48,17 +48,26 @@ export const ContactForm = () => {
                 </div>
                 <div>
                   <h4 className="font-fredoka text-sm font-bold text-zinc-900">Phone</h4>
-                  <p className="text-zinc-500 text-xs">+1 234 567 890</p>
+                  <a href="tel:+254777405410" className="text-zinc-500 hover:text-zinc-900 text-xs transition-colors">
+                    +254 777 405 410
+                  </a>
                 </div>
               </div>
 
               <div className="flex items-center space-x-4">
-                <div className="bg-zinc-50 p-3 rounded-full border border-zinc-100 shadow-sm">
-                  <Mail className="h-5 w-5 text-zinc-800" />
+                <div className="bg-zinc-50 p-3 rounded-full border border-zinc-100 shadow-sm text-green-600">
+                  <MessageCircle className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="font-fredoka text-sm font-bold text-zinc-900">Email</h4>
-                  <p className="text-zinc-500 text-xs">hello@zelanicoffee.com</p>
+                  <h4 className="font-fredoka text-sm font-bold text-zinc-900">WhatsApp</h4>
+                  <a
+                    href="https://wa.me/254777405410"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-500 hover:text-zinc-900 text-xs transition-colors"
+                  >
+                    +254 777 405 410
+                  </a>
                 </div>
               </div>
             </div>
