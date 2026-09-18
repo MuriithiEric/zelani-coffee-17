@@ -92,7 +92,7 @@ const ProductDetails = () => {
             </h1>
 
             <span className="font-fredoka text-3xl font-bold text-zinc-900">
-              {formatPrice(product.price, product.isKes)}
+              {formatPrice(product.price)}
             </span>
 
             <p className="text-zinc-500 font-inter text-sm sm:text-base leading-relaxed max-w-xl">
@@ -187,7 +187,7 @@ const ProductDetails = () => {
                     </h3>
                   </Link>
                   <span className="font-fredoka text-sm font-bold text-zinc-800 block">
-                    {formatPrice(p.price, p.isKes)}
+                    {formatPrice(p.price)}
                   </span>
                 </div>
               </div>

@@ -51,96 +51,96 @@ export const products: Product[] = [
     id: "premium-dark-roast-1kg",
     name: "Premium Dark Roast (1kg)",
     description: "Bold and rich Arabica from Kirinyaga highlands. Our largest size for true dark roast enthusiasts.",
-    price: 2700,
+    price: 35,
     image: "/lovable-uploads/premium-dark-roast-1kg.jpeg",
     grind: "Whole Beans",
     size: "1kg",
     tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
     details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully hand-picked at peak ripeness and roasted to perfection.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-dark-roast-125g",
     name: "Premium Dark Roast (125g)",
     description: "Bold and rich Arabica from Kirinyaga highlands. Perfect starter size to discover our bold dark roast.",
-    price: 400,
+    price: 5.5,
     image: "/lovable-uploads/premium-dark-roast-125g.jpeg",
     grind: "Whole Beans",
     size: "125g",
     tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
     details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This compact 125g package is perfect for trying our signature dark roast.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-dark-roast-500g",
     name: "Premium Dark Roast (500g)",
     description: "Bold and rich Arabica from Kirinyaga highlands. The ideal mid-size option for regular dark roast drinkers.",
-    price: 1400,
+    price: 19.5,
     image: "/lovable-uploads/premium-dark-roast-500g.jpeg",
     grind: "Whole Beans",
     size: "500g",
     tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
     details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. Sourced from smallholder farmers in Kirinyaga County, these whole beans are carefully roasted to perfection.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-dark-roast-250g",
     name: "Premium Dark Roast (250g)",
     description: "Bold and rich Arabica from Kirinyaga highlands. The classic mid-size for everyday enjoyment.",
-    price: 750,
+    price: 10,
     image: "/lovable-uploads/premium-dark-roast-250g.jpeg",
     grind: "Whole Beans",
     size: "250g",
     tastingNotes: ["Dark Chocolate", "Black Cherry", "Citrus"],
     details: "Our Premium Dark Roast delivers bold, intense flavors with a full body. This versatile 250g package is perfect for everyday coffee lovers.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-medium-roast-1kg",
     name: "Premium Medium Roast (1kg)",
     description: "Perfectly balanced Arabica with bright, complex flavors. Our largest size for true coffee enthusiasts.",
-    price: 2700,
+    price: 35,
     image: "/lovable-uploads/premium-medium-roast-1kg.jpeg",
     grind: "Medium Ground",
     size: "1kg",
     tastingNotes: ["Caramel", "Floral Notes", "Wine"],
     details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. Expertly ground to medium consistency, this coffee showcases the vibrant character of Kirinyaga beans.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-medium-roast-125g",
     name: "Premium Medium Roast (125g)",
     description: "Perfectly balanced Arabica with bright, complex flavors. Perfect starter size to discover our signature roast.",
-    price: 400,
+    price: 5.5,
     image: "/lovable-uploads/premium-medium-roast-125g.jpeg",
     grind: "Medium Ground",
     size: "125g",
     tastingNotes: ["Caramel", "Floral Notes", "Wine"],
     details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This compact 125g package is perfect for trying our signature roast.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-medium-roast-500g",
     name: "Premium Medium Roast (500g)",
     description: "Perfectly balanced Arabica with bright, complex flavors. The ideal mid-size option for regular coffee drinkers.",
-    price: 1400,
+    price: 19.5,
     image: "/lovable-uploads/premium-medium-roast-500g.jpeg",
     grind: "Medium Ground",
     size: "500g",
     tastingNotes: ["Caramel", "Floral Notes", "Wine"],
     details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. Expertly ground to medium consistency, showing sweet caramel notes.",
-    isKes: true
+    isKes: false
   },
   {
     id: "premium-medium-roast-250g",
     name: "Premium Medium Roast (250g)",
     description: "Perfectly balanced Arabica with bright, complex flavors. The classic mid-size for everyday enjoyment.",
-    price: 750,
+    price: 10,
     image: "/lovable-uploads/premium-medium-roast-250g.jpeg",
     grind: "Medium Ground",
     size: "250g",
     tastingNotes: ["Caramel", "Floral Notes", "Wine"],
     details: "Our Premium Medium Roast strikes the perfect balance between acidity and body. This versatile 250g package is perfect for everyday coffee lovers.",
-    isKes: true
+    isKes: false
   }
 ];

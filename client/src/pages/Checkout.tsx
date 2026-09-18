@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { api } from "@/lib/api/api-client";
 import { toast } from "sonner";
 import { ShieldCheck, Tag, Info, Sparkles, MessageCircle, Check } from "lucide-react";
 
-const KES_TO_USD = 0.0077;
 const EAST_AFRICA = ["UG", "TZ", "RW", "ET"];
 
 const COUNTRIES = [
@@ -27,16 +27,17 @@ const COUNTRIES = [
 
 function getShippingInfo(countryCode: string) {
   if (countryCode === "KE") {
-    return { label: "Delivery within Kenya", cost: 500, currency: "KES" as const };
+    return { label: "Delivery within Kenya", cost: 5.00 };
   }
   if (EAST_AFRICA.includes(countryCode)) {
-    return { label: "Regional Shipping (East Africa)", cost: 2000, currency: "KES" as const };
+    return { label: "Regional Shipping (East Africa)", cost: 15.00 };
   }
-  return { label: "International Shipping via DHL Express", cost: 35, currency: "USD" as const };
+  return { label: "International Shipping via DHL Express", cost: 35.00 };
 }
 
 export default function Checkout() {
   const { items, getCartTotal, clearCart } = useCart();
+  const { currency, formatPrice } = useCurrency();
   const navigate = useNavigate();
 
   // Redirect to home if cart is empty
@@ -89,28 +90,16 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<"paypal" | "whatsapp">("paypal");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Pricing calculations
-  const productTotalKES = getCartTotal();
+  // Pricing calculations (all product prices in cart are base USD values)
+  const productSubtotal = getCartTotal();
   const shipping = getShippingInfo(country);
-  const isInternational = shipping.currency === "USD";
-
-  const productSubtotal = isInternational
-    ? Math.round(productTotalKES * KES_TO_USD * 100) / 100
-    : productTotalKES;
+  const shippingCost = shipping.cost;
 
   // Apply 10% discount if logged in
   const discountRate = isUserLoggedIn ? 0.10 : 0.0;
   const discountAmount = productSubtotal * discountRate;
-  const shippingCost = shipping.cost;
   const orderTotal = productSubtotal - discountAmount + shippingCost;
-  const displayCurrency: "KES" | "USD" = isInternational ? "USD" : "KES";
-
-  const formatPrice = (amount: number) => {
-    return `${displayCurrency} ${amount.toLocaleString(undefined, {
-      minimumFractionDigits: displayCurrency === "USD" ? 2 : 0,
-      maximumFractionDigits: 2,
-    })}`;
-  };
+  const displayCurrency = currency;
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,12 +146,11 @@ export default function Checkout() {
 
       if (paymentMethod === "paypal") {
         toast.info("Order placed! Redirecting to PayPal to pay muraypatrick@gmail.com...");
-        const paypalAmount = displayCurrency === "USD"
-          ? orderTotal.toFixed(2)
-          : (orderTotal * KES_TO_USD).toFixed(2);
+        const paypalAmount = (currency === "GBP" ? orderTotal * 0.78 : orderTotal).toFixed(2);
+        const paypalCurrency = currency;
         const returnUrl = `${window.location.origin}/thank-you?ref=${orderRef}`;
         const cancelUrl = window.location.href;
-        const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=muraypatrick@gmail.com&item_name=${encodeURIComponent(`Zelani Coffee Order ${orderRef}`)}&amount=${paypalAmount}&currency_code=USD&return=${encodeURIComponent(returnUrl)}&cancel_return=${encodeURIComponent(cancelUrl)}`;
+        const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=muraypatrick@gmail.com&item_name=${encodeURIComponent(`Zelani Coffee Order ${orderRef}`)}&amount=${paypalAmount}&currency_code=${paypalCurrency}&return=${encodeURIComponent(returnUrl)}&cancel_return=${encodeURIComponent(cancelUrl)}`;
 
         setTimeout(() => {
           window.location.href = paypalUrl;
@@ -424,14 +412,14 @@ export default function Checkout() {
                           PayPal Direct Payment to <span className="font-mono text-[#b37e38] font-bold">muraypatrick@gmail.com</span>
                         </p>
                         <p className="text-xs text-zinc-600 leading-relaxed">
-                          When you click <strong>Place Order & Pay with PayPal</strong>, you will be redirected to PayPal's secure portal to pay directly to <span className="font-mono font-semibold text-zinc-800">muraypatrick@gmail.com</span>. Once payment completes, you'll be redirected back to Zelani Coffee.
+                          When you click <strong>Place Order & Pay with PayPal</strong>, you will be redirected to PayPal's secure portal to pay directly to <span className="font-mono font-semibold text-zinc-800">muraypatrick@gmail.com</span>. Once payment completes, a <strong>DHL Express shipment & courier pickup</strong> will be automatically booked with real-time tracking.
                         </p>
                       </div>
                     </div>
                     <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-zinc-600 gap-1">
                       <span>Total to pay via PayPal:</span>
                       <span className="font-bold text-zinc-900 text-sm">
-                        USD {displayCurrency === "USD" ? orderTotal.toFixed(2) : (orderTotal * KES_TO_USD).toFixed(2)}
+                        {formatPrice(orderTotal)}
                       </span>
                     </div>
                   </div>
@@ -477,11 +465,7 @@ export default function Checkout() {
                         <p className="text-xs text-zinc-500">Qty: {item.quantity}</p>
                       </div>
                       <span className="font-medium shrink-0">
-                        {formatPrice(
-                          (isInternational
-                            ? Math.round(item.product.price * KES_TO_USD * 100) / 100
-                            : item.product.price) * item.quantity
-                        )}
+                        {formatPrice(item.product.price * item.quantity)}
                       </span>
                     </div>
                   ))}

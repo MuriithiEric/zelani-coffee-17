@@ -410,7 +410,7 @@ export default function Admin() {
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Total Sales</p>
                   <p className="text-2xl font-black text-zinc-900">
-                    KES {(orders.filter(o => o.payment_status === "completed").reduce((a, c) => a + c.total_amount, 0) || 120400).toLocaleString()}
+                    ${(orders.filter(o => o.payment_status === "completed").reduce((a, c) => a + c.total_amount, 0) || 1200).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div className="bg-[#fefaf0] border border-[#c89547]/20 p-3.5 rounded-full">
@@ -554,7 +554,7 @@ export default function Admin() {
                         <p className="text-[10px] text-zinc-400 font-bold uppercase">{p.grind}</p>
                       </td>
                       <td className="p-4 font-bold text-zinc-800">
-                        KES {p.price.toLocaleString()}
+                        ${p.price.toFixed(2)}
                       </td>
                       <td className="p-4 text-right pr-6 space-x-1">
                         <button
@@ -792,7 +792,7 @@ export default function Admin() {
               <Input required value={prodName} onChange={(e) => setProdName(e.target.value)} className="bg-white rounded-full" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-500 uppercase">Price (KES)</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase">Base Price (USD)</label>
               <Input required type="number" value={prodPrice} onChange={(e) => setProdPrice(Number(e.target.value))} className="bg-white rounded-full" />
             </div>
             <div className="space-y-1.5">
@@ -877,20 +877,37 @@ export default function Admin() {
                 <div className="bg-white rounded-xl p-4 border border-zinc-150 grid grid-cols-2 gap-4 text-xs font-semibold">
                   <div>
                     <span className="text-zinc-400 block uppercase">Reference</span>
-                    <span className="text-zinc-800 font-mono">{order.order_reference}</span>
+                    <span className="text-zinc-800 font-mono">{order.order_reference || order.orderReference}</span>
                   </div>
                   <div>
                     <span className="text-zinc-400 block uppercase">Placed Date</span>
-                    <span className="text-zinc-800">{new Date(order.created_at).toLocaleString()}</span>
+                    <span className="text-zinc-800">{new Date(order.created_at || order.createdAt).toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-zinc-400 block uppercase">Email</span>
-                    <span className="text-zinc-800">{order.customer_email}</span>
+                    <span className="text-zinc-800">{order.customer_email || order.customerEmail}</span>
                   </div>
                   <div>
                     <span className="text-zinc-400 block uppercase">Total Amount</span>
-                    <span className="text-[#c89547] text-sm font-bold">{order.currency} {order.total_amount.toLocaleString()}</span>
+                    <span className="text-[#c89547] text-sm font-bold">{order.currency} {Number(order.total_amount || order.totalAmount).toLocaleString()}</span>
                   </div>
+
+                  {(order.dhl_tracking_number || order.dhlTrackingNumber) && (
+                    <div className="col-span-2 pt-2 border-t border-zinc-100 flex flex-col gap-1.5 bg-amber-50/50 p-3 rounded-xl border border-amber-200/60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-amber-800 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1">
+                          <Truck className="h-3.5 w-3.5 text-amber-700" /> DHL Express Waybill
+                        </span>
+                        <span className="font-mono text-amber-900 font-bold">{order.dhl_tracking_number || order.dhlTrackingNumber}</span>
+                      </div>
+                      {(order.dhl_pickup_confirmation || order.dhlPickupConfirmation) && (
+                        <div className="flex items-center justify-between text-[11px] text-zinc-600">
+                          <span>Courier Pickup Booking:</span>
+                          <span className="font-mono font-semibold text-zinc-800">{order.dhl_pickup_confirmation || order.dhlPickupConfirmation}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

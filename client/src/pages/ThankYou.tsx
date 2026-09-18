@@ -1,14 +1,24 @@
+import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { CheckCircle, Home, MessageCircle, ShoppingBag, Truck, Clipboard, Check } from "lucide-react";
+import { CheckCircle, Home, MessageCircle, ShoppingBag, Truck, Clipboard, Check, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { toast } from "sonner";
+import { api } from "@/lib/api/api-client";
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const orderRef = searchParams.get("ref") || `zelani_order_${Date.now()}`;
   const [copied, setCopied] = useState(false);
+  const [orderDetails, setOrderDetails] = useState<any>(null);
+
+  useEffect(() => {
+    if (orderRef) {
+      api.orders.getByReference(orderRef)
+        .then((data) => setOrderDetails(data))
+        .catch(() => {});
+    }
+  }, [orderRef]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(orderRef);
@@ -33,18 +43,31 @@ const ThankYou = () => {
         </p>
 
         {/* Order Reference Box */}
-        <div className="bg-white border border-zinc-150 rounded-2xl p-6 shadow-sm mb-6 flex flex-col items-center justify-center gap-3">
-          <p className="text-xs uppercase tracking-widest font-bold text-zinc-400">Order Reference</p>
-          <div className="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-full px-5 py-2">
-            <span className="font-mono text-sm sm:text-base font-semibold text-zinc-800">{orderRef}</span>
-            <button 
-              onClick={handleCopy} 
-              className="text-zinc-450 hover:text-zinc-700 transition-colors shrink-0 ml-1.5"
-              title="Copy Reference"
-            >
-              {copied ? <Check className="h-4 w-4 text-green-600" /> : <Clipboard className="h-4 w-4" />}
-            </button>
+        <div className="bg-white border border-zinc-150 rounded-2xl p-6 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-around gap-4">
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="text-xs uppercase tracking-widest font-bold text-zinc-400">Order Reference</p>
+            <div className="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-full px-5 py-2">
+              <span className="font-mono text-sm sm:text-base font-semibold text-zinc-800">{orderRef}</span>
+              <button 
+                onClick={handleCopy} 
+                className="text-zinc-450 hover:text-zinc-700 transition-colors shrink-0 ml-1.5"
+                title="Copy Reference"
+              >
+                {copied ? <Check className="h-4 w-4 text-green-600" /> : <Clipboard className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
+          {orderDetails?.dhlTrackingNumber && (
+            <div className="flex flex-col items-center gap-1.5">
+              <p className="text-xs uppercase tracking-widest font-bold text-amber-700 flex items-center gap-1">
+                <Truck className="h-3.5 w-3.5" /> DHL Express Waybill
+              </p>
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-full px-5 py-2">
+                <span className="font-mono text-sm font-bold text-amber-900">{orderDetails.dhlTrackingNumber}</span>
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="bg-white border border-zinc-150 rounded-2xl shadow-sm p-8 mb-6">

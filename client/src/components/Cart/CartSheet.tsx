@@ -11,6 +11,7 @@ import { useCart } from "@/hooks/useCart";
 import { CartItem } from "./CartItem";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CartSheetProps {
   open: boolean;
@@ -19,17 +20,14 @@ interface CartSheetProps {
 
 export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
   const { items, getCartTotal } = useCart();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
-  const productTotalKES = getCartTotal();
+  const productTotal = getCartTotal();
 
   const handleProceedToCheckout = () => {
     onOpenChange(false);
     navigate("/checkout");
-  };
-
-  const formatPrice = (amount: number) => {
-    return `KES ${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   };
 
   if (items.length === 0) {
@@ -93,7 +91,7 @@ export const CartSheet = ({ open, onOpenChange }: CartSheetProps) => {
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500 font-medium">Subtotal</span>
             <span className="text-zinc-900 font-bold text-base">
-              {formatPrice(productTotalKES)}
+              {formatPrice(productTotal)}
             </span>
           </div>
 

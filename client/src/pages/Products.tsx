@@ -82,7 +82,7 @@ const Products = () => {
                 {/* Pricing and Action row */}
                 <div className="flex justify-between items-center pt-4 mt-4 border-t border-zinc-50">
                   <span className="font-fredoka text-lg font-bold text-zinc-900">
-                    {formatPrice(product.price, product.isKes)}
+                    {formatPrice(product.price)}
                   </span>
                   
                   <button

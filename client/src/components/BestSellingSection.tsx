@@ -94,7 +94,7 @@ export const BestSellingSection = () => {
               {/* Footer Row: Price & Buy Button */}
               <div className="flex justify-between items-center pt-6 mt-6 border-t border-zinc-100/50">
                 <span className="font-fredoka text-xl font-bold text-zinc-900">
-                  {formatPrice(product.price, false)}
+                  {formatPrice(product.price)}
                 </span>
                 <button
                   onClick={() => addToCart(product)}

@@ -2,6 +2,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem as CartItemType } from "@/contexts/CartContext";
 import { useCart } from "@/hooks/useCart";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CartItemProps {
   item: CartItemType;
@@ -9,6 +10,7 @@ interface CartItemProps {
 
 export const CartItem = ({ item }: CartItemProps) => {
   const { updateQuantity, removeFromCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <div className="flex gap-4 py-4 border-b border-border">
@@ -22,8 +24,8 @@ export const CartItem = ({ item }: CartItemProps) => {
         <p className="text-sm text-muted-foreground">
           {item.product.grind} • {item.product.size}
         </p>
-        <p className="text-sm font-semibold text-gold-600 mt-1">
-          KES {item.product.price.toLocaleString()}
+        <p className="text-sm font-semibold text-[#b37e38] mt-1">
+          {formatPrice(item.product.price * item.quantity)}
         </p>
       </div>
       <div className="flex flex-col items-end justify-between">

@@ -152,16 +152,28 @@ const TrackOrder = () => {
           events.unshift({
             date: formatD(paymentDate),
             time: formatT(paymentDate),
-            description: "Payment confirmed. Preparing items for packaging.",
+            description: "Payment confirmed via PayPal.",
             location: "Nairobi Roastery, KE",
           });
 
-          // Mock roasting phase
+          if (orderData.dhlTrackingNumber || orderData.dhl_tracking_number) {
+            const dhlNum = orderData.dhlTrackingNumber || orderData.dhl_tracking_number;
+            const dhlPu = orderData.dhlPickupConfirmation || orderData.dhl_pickup_confirmation || "CBK-SCHEDULED";
+            const dhlDate = new Date(createdDate.getTime() + 15 * 60 * 1000);
+            events.unshift({
+              date: formatD(dhlDate),
+              time: formatT(dhlDate),
+              description: `DHL Express Shipment Booked. Waybill #${dhlNum} (Pickup Booking: ${dhlPu}).`,
+              location: "DHL Express Airport Gateway, KE",
+            });
+          }
+
+          // Roasting & packaging phase
           const roastingDate = new Date(createdDate.getTime() + 2 * 60 * 60 * 1000); // +2 hrs
           events.unshift({
             date: formatD(roastingDate),
             time: formatT(roastingDate),
-            description: "Premium coffee beans selected and packaged securely.",
+            description: "Premium coffee beans selected, packaged, and labeled for DHL courier pickup.",
             location: "Nairobi Packaging Center, KE",
           });
         }

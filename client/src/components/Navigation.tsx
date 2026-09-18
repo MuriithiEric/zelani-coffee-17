@@ -79,7 +79,6 @@ export const Navigation = () => {
   const aboutDropdownItems = [
     { label: "Our Story", href: "/our-story" },
     { label: "Impact 2030", href: "/impact" },
-    { label: "Our Speciality", href: "/#speciality" },
     { label: "Find Us", href: "/#find-us" },
   ];
 
@@ -106,7 +105,7 @@ export const Navigation = () => {
   const isAboutActive = 
     location.pathname === "/our-story" || 
     location.pathname === "/impact" || 
-    (isHomePage && (location.hash === "#speciality" || location.hash === "#find-us"));
+    (isHomePage && location.hash === "#find-us");
 
   return (
     <nav className={`fixed top-0 w-full z-50 py-3 transition-all duration-350 ${
